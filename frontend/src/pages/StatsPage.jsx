@@ -10,6 +10,18 @@ import {
 import { getWorkoutById, getWorkouts } from '../api/workoutApi'
 import ProgressChart from '../components/ProgressChart'
 
+function formatWeight(kilograms) {
+    const value = Number(kilograms || 0)
+    if (value > 1000) {
+        return `${(value / 1000).toLocaleString('pt-BR', {
+            maximumFractionDigits: 2
+        })} t`
+    }
+    return `${value.toLocaleString('pt-BR', {
+        maximumFractionDigits: 2
+    })} kg`
+}
+
 export default function StatsPage() {
     const [period, setPeriod] = useState('week')
     const [stats, setStats] = useState(null)
@@ -71,10 +83,9 @@ export default function StatsPage() {
                 workouts.map((workout) => getWorkoutById(workout.id))
             )
             const allExercises = details.flatMap((workout) =>
-                workout.exercises.map((exercise) => ({
-                    ...exercise,
-                    workout_name: workout.name
-                }))
+                workout.exercises
+                    .filter((exercise) => exercise.kind === 'resistance')
+                    .map((exercise) => exercise)
             )
             setExercises(allExercises)
             if (allExercises.length) {
@@ -104,14 +115,14 @@ export default function StatsPage() {
                     <p>Acompanhe frequência, volume e evolução de carga.</p>
                 </div>
                 <div className="period-control" aria-label="Período">
-                    {['day', 'week', 'month'].map((value) => (
+                    {['day', 'week', 'month', 'year'].map((value) => (
                         <button
                             key={value}
                             type="button"
                             className={period === value ? 'active' : ''}
                             onClick={() => setPeriod(value)}
                         >
-                            {{ day: 'Dia', week: 'Semana', month: 'Mês' }[value]}
+                            {{ day: 'Dia', week: 'Semana', month: 'Mês', year: 'Ano' }[value]}
                         </button>
                     ))}
                 </div>
@@ -123,7 +134,7 @@ export default function StatsPage() {
                     <div className="stats-grid">
                         <div className="stat-card">
                             <h3>Peso total</h3>
-                            <p>{totalWeight?.total_weight_kg ?? 0} kg</p>
+                            <p>{formatWeight(totalWeight?.total_weight_kg)}</p>
                         </div>
                         <div className="stat-card">
                             <h3>Dias treinados</h3>
@@ -154,7 +165,7 @@ export default function StatsPage() {
                                 )}
                                 {exercises.map((exercise) => (
                                     <option key={exercise.id} value={exercise.id}>
-                                        {exercise.name}, {exercise.workout_name}
+                                        {exercise.name}
                                     </option>
                                 ))}
                             </select>

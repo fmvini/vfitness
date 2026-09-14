@@ -1,4 +1,11 @@
-import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom'
+import { useEffect } from 'react'
+import {
+    BrowserRouter,
+    Routes,
+    Route,
+    Navigate,
+    useLocation
+} from 'react-router-dom'
 
 import { useAuth } from './context/AuthContext'
 
@@ -11,6 +18,16 @@ import WorkoutDetailPage from './pages/WorkoutDetailPage'
 import WorkoutSessionPage from './pages/WorkoutSessionPage'
 import TodayWorkoutPage from './pages/TodayWorkoutPage'
 import StatsPage from './pages/StatsPage'
+
+function ScrollToTop() {
+    const { pathname } = useLocation()
+
+    useEffect(() => {
+        window.scrollTo(0, 0)
+    }, [pathname])
+
+    return null
+}
 
 function ProtectedRoute({ children }) {
     const { isAuthenticated, loading } = useAuth()
@@ -48,6 +65,7 @@ export default function App() {
                 v7_relativeSplatPath: true
             }}
         >
+            <ScrollToTop />
             <Navbar />
 
             <Routes>

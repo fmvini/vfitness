@@ -39,9 +39,9 @@ from app.services.stats_service import (
 router = APIRouter()
 
 # "dia" so se aplica ao peso total levantado; os graficos de evolucao e a
-# frequencia comparam apenas semana ou mes (secao 2.6).
+# frequencia aceitam semana, mes ou ano (secao 2.6).
 Period = Literal["day", "week", "month", "year"]
-ProgressPeriod = Literal["week", "month"]
+ProgressPeriod = Literal["week", "month", "year"]
 
 
 # --- Schemas de resposta ---

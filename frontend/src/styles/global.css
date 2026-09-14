@@ -142,6 +142,8 @@ h3 {
 
 .dashboard-page,
 .workout-detail-page,
+.workout-session-page,
+.today-page,
 .stats-page,
 .auth-page {
     width: min(100% - var(--space-8), var(--container-width));
@@ -262,14 +264,14 @@ button:active,
 }
 
 .exercise-actions button:last-child,
-.workout-card-actions button {
+.workout-card-actions button:last-child {
     border-color: transparent;
     background: var(--color-danger-soft);
     color: var(--color-danger);
 }
 
 .exercise-actions button:last-child:hover,
-.workout-card-actions button:hover {
+.workout-card-actions button:last-child:hover {
     background: var(--color-danger);
     color: #ffffff;
 }
@@ -325,6 +327,13 @@ button:active,
 .button-secondary:hover {
     border-color: var(--color-border-strong);
     background: var(--color-surface);
+}
+
+.workout-card-actions a.button-secondary,
+.workout-card-actions a.button-secondary:hover {
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-muted);
+    color: var(--color-text);
 }
 
 .form-error,
@@ -427,13 +436,142 @@ a.workout-card:focus-visible {
 }
 
 .exercise-form {
-    grid-template-columns: repeat(5, minmax(120px, 1fr));
-    align-items: end;
+    display: block;
     margin: var(--space-6) 0;
 }
 
-.exercise-form button {
-    min-width: 180px;
+.activity-type,
+.period-control {
+    display: inline-flex;
+    gap: 2px;
+    padding: 3px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-bg-muted);
+}
+
+.activity-type {
+    margin-bottom: var(--space-5);
+}
+
+.activity-type button,
+.period-control button {
+    min-height: 36px;
+    border: 0;
+    background: transparent;
+    color: var(--color-text-muted);
+    padding: 0.55rem 0.8rem;
+}
+
+.activity-type button:hover,
+.activity-type button.active,
+.period-control button:hover,
+.period-control button.active {
+    background: var(--color-surface);
+    color: var(--color-text);
+}
+
+.exercise-fields {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(130px, 1fr));
+    align-items: start;
+    gap: var(--space-4);
+}
+
+.exercise-fields label small,
+.session-value-field small {
+    min-height: 2.5em;
+    color: var(--color-text-muted);
+    font-size: 0.76rem;
+    font-weight: 500;
+    line-height: 1.35;
+}
+
+.exercise-fields.cardio-fields {
+    grid-template-columns: repeat(2, minmax(180px, 280px));
+}
+
+.exercise-submit {
+    min-width: 190px;
+    margin-top: var(--space-5);
+}
+
+.checkbox-field {
+    display: flex;
+    min-height: 46px;
+    align-items: flex-start;
+    gap: var(--space-3);
+}
+
+.checkbox-field input,
+.completion-check input {
+    width: 18px;
+    min-height: 18px;
+    margin: 2px 0 0;
+    accent-color: var(--color-primary);
+}
+
+.checkbox-field span {
+    display: grid;
+    gap: var(--space-1);
+}
+
+.checkbox-field small {
+    min-height: 0;
+}
+
+.dumbbell-option {
+    grid-column: 4 / 6;
+}
+
+.drag-handle {
+    flex: 0 0 auto;
+    color: var(--color-text-muted);
+    cursor: grab;
+    font-size: 1.2rem;
+    font-weight: 800;
+    letter-spacing: 2px;
+    line-height: 1;
+    padding-top: var(--space-1);
+}
+
+.exercise-title-row {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+}
+
+.exercise-title-row h3 {
+    margin: 0;
+}
+
+.activity-badge,
+.session-label {
+    color: var(--color-primary);
+    font-size: 0.75rem;
+    font-weight: 800;
+    text-transform: uppercase;
+}
+
+.draggable-exercise {
+    transition: opacity var(--transition-fast), transform var(--transition-fast);
+}
+
+.draggable-exercise.dragging {
+    opacity: 0.45;
+    transform: scale(0.99);
+}
+
+.icon-button {
+    width: 42px;
+    flex: 0 0 42px;
+    padding: 0;
+    font-size: 1.15rem;
+}
+
+.icon-button:disabled {
+    opacity: 0.35;
 }
 
 .exercise-item {
@@ -495,29 +633,6 @@ a.workout-card:focus-visible {
     max-width: 680px;
 }
 
-.period-control {
-    display: inline-flex;
-    gap: 2px;
-    padding: 3px;
-    border: 1px solid var(--color-border);
-    border-radius: var(--radius-md);
-    background: var(--color-bg-muted);
-}
-
-.period-control button {
-    min-height: 36px;
-    border: 0;
-    background: transparent;
-    color: var(--color-text-muted);
-    padding: 0.55rem 0.8rem;
-}
-
-.period-control button:hover,
-.period-control button.active {
-    background: var(--color-surface);
-    color: var(--color-text);
-}
-
 .chart-section,
 .ranking-section {
     margin-top: var(--space-8);
@@ -573,6 +688,185 @@ a.workout-card:focus-visible {
     min-height: 44px;
 }
 
+.session-header {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-5);
+    margin-bottom: var(--space-6);
+}
+
+.session-header h1 {
+    margin: var(--space-2) 0;
+}
+
+.session-header p {
+    margin: 0;
+}
+
+.session-progress {
+    margin-bottom: var(--space-6);
+}
+
+.session-progress span {
+    color: var(--color-text-muted);
+}
+
+.progress-track {
+    height: 8px;
+    margin-top: var(--space-3);
+    overflow: hidden;
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-muted);
+}
+
+.progress-track span {
+    display: block;
+    height: 100%;
+    background: var(--color-success);
+    transition: width var(--transition-fast);
+}
+
+.session-exercises {
+    display: grid;
+    gap: var(--space-5);
+}
+
+.session-card {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-sm);
+    padding: var(--space-5);
+}
+
+.session-card.complete {
+    border-color: color-mix(in srgb, var(--color-success) 55%, var(--color-border));
+}
+
+.session-card-header {
+    display: grid;
+    grid-template-columns: 36px 1fr auto;
+    align-items: start;
+    gap: var(--space-4);
+}
+
+.session-card-header h2,
+.session-card-header p {
+    margin-bottom: var(--space-1);
+}
+
+.exercise-number {
+    display: grid;
+    width: 36px;
+    aspect-ratio: 1;
+    place-items: center;
+    border-radius: 50%;
+    background: var(--color-primary-soft);
+    color: var(--color-primary);
+    font-weight: 800;
+}
+
+.completion-check {
+    display: flex;
+    align-items: center;
+    gap: var(--space-2);
+}
+
+.session-load-row {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--space-5);
+    margin: var(--space-5) 0;
+    padding-top: var(--space-5);
+    border-top: 1px solid var(--color-border);
+}
+
+.session-load-row > span {
+    color: var(--color-text-muted);
+    font-size: 0.88rem;
+}
+
+.session-value-field {
+    width: min(100%, 320px);
+}
+
+.sets-list {
+    display: grid;
+    gap: var(--space-3);
+}
+
+.set-row {
+    display: grid;
+    grid-template-columns: 72px 1fr;
+    align-items: center;
+    gap: var(--space-4);
+    padding-top: var(--space-3);
+    border-top: 1px solid var(--color-border);
+}
+
+.repetition-checks {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-2);
+}
+
+.repetition-checks label {
+    position: relative;
+    display: block;
+}
+
+.repetition-checks input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    min-height: 0;
+    opacity: 0;
+}
+
+.repetition-checks span {
+    display: grid;
+    width: 34px;
+    aspect-ratio: 1;
+    place-items: center;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    background: var(--color-bg-muted);
+    color: var(--color-text-muted);
+    cursor: pointer;
+    font-size: 0.82rem;
+    font-weight: 700;
+}
+
+.repetition-checks input:checked + span {
+    border-color: var(--color-success);
+    background: color-mix(in srgb, var(--color-success) 18%, var(--color-surface));
+    color: var(--color-text);
+}
+
+.repetition-checks input:focus-visible + span {
+    box-shadow: 0 0 0 3px var(--color-primary-soft);
+}
+
+.finish-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-5);
+    margin-top: var(--space-6);
+    border: 1px solid var(--color-border-strong);
+    border-radius: var(--radius-lg);
+    background: color-mix(in srgb, var(--color-bg-elevated) 94%, transparent);
+    box-shadow: var(--shadow-md);
+    padding: var(--space-4) var(--space-5);
+    backdrop-filter: blur(12px);
+}
+
+.finish-bar p {
+    margin: var(--space-1) 0 0;
+}
+
 .progress-chart {
     min-height: 280px;
 }
@@ -606,6 +900,8 @@ a.workout-card:focus-visible {
 
     .dashboard-page,
     .workout-detail-page,
+    .workout-session-page,
+    .today-page,
     .stats-page,
     .auth-page {
         width: min(100% - var(--space-5), var(--container-width));
@@ -617,8 +913,13 @@ a.workout-card:focus-visible {
         padding-top: var(--space-10);
     }
 
-    .exercise-form {
+    .exercise-fields,
+    .exercise-fields.cardio-fields {
         grid-template-columns: 1fr;
+    }
+
+    .dumbbell-option {
+        grid-column: auto;
     }
 
     .workout-form,
@@ -627,7 +928,10 @@ a.workout-card:focus-visible {
     }
 
     .page-heading,
-    .section-heading {
+    .section-heading,
+    .session-header,
+    .session-load-row,
+    .finish-bar {
         align-items: stretch;
         flex-direction: column;
     }
@@ -636,7 +940,7 @@ a.workout-card:focus-visible {
         width: 100%;
     }
 
-    .exercise-form button {
+    .exercise-submit {
         width: 100%;
     }
 
@@ -653,5 +957,26 @@ a.workout-card:focus-visible {
     .workout-card-actions button,
     .workout-card-actions a {
         flex: 1 1 140px;
+    }
+
+    .exercise-actions .icon-button {
+        flex: 0 0 42px;
+    }
+
+    .session-card-header {
+        grid-template-columns: 36px 1fr;
+    }
+
+    .completion-check {
+        grid-column: 1 / -1;
+        margin-top: var(--space-2);
+    }
+
+    .set-row {
+        grid-template-columns: 1fr;
+    }
+
+    .finish-bar button {
+        width: 100%;
     }
 }
