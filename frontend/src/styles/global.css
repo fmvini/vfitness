@@ -1,0 +1,442 @@
+* {
+    box-sizing: border-box;
+}
+
+html {
+    min-height: 100%;
+    background: var(--color-bg);
+    color: var(--color-text);
+    font-family: var(--font-family-base);
+    text-rendering: optimizeLegibility;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+    min-width: 320px;
+    min-height: 100vh;
+    margin: 0;
+    background:
+        linear-gradient(
+            180deg,
+            var(--color-bg-elevated) 0,
+            var(--color-bg) 320px
+        );
+    color: var(--color-text);
+}
+
+body,
+button,
+input,
+select,
+textarea {
+    font: inherit;
+}
+
+button,
+input,
+select,
+textarea {
+    border: 0;
+}
+
+button {
+    cursor: pointer;
+}
+
+button:disabled {
+    cursor: not-allowed;
+    opacity: 0.68;
+}
+
+a {
+    color: inherit;
+    text-decoration: none;
+}
+
+p,
+h1,
+h2,
+h3 {
+    margin-top: 0;
+}
+
+p {
+    color: var(--color-text-muted);
+    line-height: 1.6;
+}
+
+h1 {
+    margin-bottom: var(--space-6);
+    color: var(--color-text);
+    font-size: clamp(2rem, 1.72rem + 1vw, 2.75rem);
+    font-weight: 760;
+    line-height: 1.1;
+}
+
+h2 {
+    margin-bottom: var(--space-4);
+    color: var(--color-text);
+    font-size: 1.45rem;
+    line-height: 1.25;
+}
+
+h3 {
+    margin-bottom: var(--space-2);
+    color: var(--color-text);
+    font-size: 1rem;
+    line-height: 1.35;
+}
+
+#root {
+    min-height: 100vh;
+}
+
+.navbar {
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    display: flex;
+    min-height: var(--navbar-height);
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-4);
+    padding: var(--space-4) max(var(--space-5), calc((100vw - var(--container-width)) / 2));
+    border-bottom: 1px solid var(--color-border);
+    background: color-mix(in srgb, var(--color-bg-elevated) 92%, transparent);
+    backdrop-filter: blur(12px);
+}
+
+.navbar-left,
+.navbar-right {
+    display: flex;
+    align-items: center;
+    gap: var(--space-4);
+}
+
+.navbar-left a:not(.navbar-logo) {
+    color: var(--color-text-muted);
+    font-size: 0.95rem;
+    font-weight: 600;
+}
+
+.navbar-left a:not(.navbar-logo):hover,
+.navbar-left a:not(.navbar-logo):focus-visible {
+    color: var(--color-text);
+}
+
+.navbar-logo {
+    color: var(--color-text);
+    font-size: 1.15rem;
+    font-weight: 800;
+}
+
+.navbar-user {
+    max-width: 180px;
+    overflow: hidden;
+    color: var(--color-text-soft);
+    font-size: 0.9rem;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.dashboard-page,
+.workout-detail-page,
+.stats-page,
+.auth-page {
+    width: min(100% - var(--space-8), var(--container-width));
+    margin: 0 auto;
+    padding: var(--space-10) 0;
+}
+
+.auth-page {
+    display: grid;
+    width: min(100% - var(--space-8), 420px);
+    min-height: 100vh;
+    align-content: center;
+}
+
+.auth-page h1 {
+    margin-bottom: var(--space-5);
+}
+
+.auth-page > p {
+    margin: var(--space-5) 0 0;
+    text-align: center;
+}
+
+.auth-page a {
+    color: var(--color-primary);
+    font-weight: 700;
+}
+
+form {
+    display: grid;
+    gap: var(--space-4);
+}
+
+input,
+select,
+textarea {
+    width: 100%;
+    min-height: 46px;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-md);
+    background: var(--color-surface);
+    color: var(--color-text);
+    outline: none;
+    padding: 0.75rem 0.9rem;
+    transition:
+        border-color var(--transition-fast),
+        box-shadow var(--transition-fast),
+        background-color var(--transition-fast);
+}
+
+input::placeholder,
+textarea::placeholder {
+    color: var(--color-text-muted);
+}
+
+input:focus,
+select:focus,
+textarea:focus {
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px var(--color-primary-soft);
+}
+
+button,
+.button,
+.workout-card-actions a {
+    display: inline-flex;
+    min-height: 42px;
+    align-items: center;
+    justify-content: center;
+    border-radius: var(--radius-md);
+    background: var(--color-primary);
+    color: #ffffff;
+    font-weight: 700;
+    line-height: 1;
+    padding: 0.75rem 1rem;
+    transition:
+        background-color var(--transition-fast),
+        border-color var(--transition-fast),
+        color var(--transition-fast),
+        transform var(--transition-fast);
+}
+
+button:hover,
+.button:hover,
+.workout-card-actions a:hover {
+    background: var(--color-primary-hover);
+}
+
+button:active,
+.button:active,
+.workout-card-actions a:active {
+    transform: translateY(1px);
+}
+
+.theme-toggle,
+.navbar-right button,
+.exercise-actions button,
+.workout-card-actions button {
+    border: 1px solid var(--color-border);
+    background: var(--color-bg-muted);
+    color: var(--color-text);
+}
+
+.theme-toggle:hover,
+.navbar-right button:hover,
+.exercise-actions button:hover,
+.workout-card-actions button:hover {
+    border-color: var(--color-border-strong);
+    background: var(--color-surface);
+}
+
+.exercise-actions button:last-child,
+.workout-card-actions button {
+    border-color: transparent;
+    background: var(--color-danger-soft);
+    color: var(--color-danger);
+}
+
+.exercise-actions button:last-child:hover,
+.workout-card-actions button:hover {
+    background: var(--color-danger);
+    color: #ffffff;
+}
+
+.workout-list,
+.stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: var(--space-4);
+}
+
+.workout-card,
+.exercise-card,
+.exercise-item,
+.stat-card,
+.stats-section {
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-surface);
+    box-shadow: var(--shadow-sm);
+}
+
+.workout-card,
+.exercise-card,
+.stat-card,
+.stats-section {
+    padding: var(--space-5);
+}
+
+a.workout-card {
+    display: block;
+    transition:
+        border-color var(--transition-fast),
+        box-shadow var(--transition-fast),
+        transform var(--transition-fast);
+}
+
+a.workout-card:hover,
+a.workout-card:focus-visible {
+    border-color: var(--color-primary-border);
+    box-shadow: var(--shadow-md);
+    transform: translateY(-2px);
+}
+
+.workout-card p,
+.exercise-card p,
+.exercise-item p,
+.stat-card p,
+.stats-section p {
+    margin-bottom: 0;
+}
+
+.workout-card-actions,
+.exercise-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-3);
+    margin-top: var(--space-4);
+}
+
+.exercise-form {
+    grid-template-columns: repeat(5, minmax(120px, 1fr));
+    align-items: end;
+    margin: var(--space-6) 0;
+}
+
+.exercise-form button {
+    min-width: 180px;
+}
+
+.exercise-item {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: var(--space-5);
+    padding: var(--space-5);
+}
+
+.exercise-info {
+    display: grid;
+    gap: var(--space-1);
+}
+
+.exercise-info p {
+    margin: 0;
+}
+
+.exercise-card + .exercise-card,
+.exercise-item + .exercise-item {
+    margin-top: var(--space-4);
+}
+
+.stats-grid {
+    margin-bottom: var(--space-6);
+}
+
+.stat-card {
+    min-height: 128px;
+}
+
+.stat-card p {
+    color: var(--color-primary);
+    font-size: 2rem;
+    font-weight: 800;
+    line-height: 1.1;
+}
+
+.stats-section {
+    max-width: 680px;
+}
+
+.progress-chart {
+    min-height: 280px;
+}
+
+.chart-empty {
+    display: grid;
+    min-height: 220px;
+    place-items: center;
+    border: 1px dashed var(--color-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-bg-elevated);
+    color: var(--color-text-muted);
+}
+
+@media (max-width: 760px) {
+    .navbar {
+        position: static;
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .navbar-left,
+    .navbar-right {
+        width: 100%;
+        flex-wrap: wrap;
+    }
+
+    .navbar-right {
+        justify-content: space-between;
+    }
+
+    .dashboard-page,
+    .workout-detail-page,
+    .stats-page,
+    .auth-page {
+        width: min(100% - var(--space-5), var(--container-width));
+        padding: var(--space-8) 0;
+    }
+
+    .auth-page {
+        min-height: auto;
+        padding-top: var(--space-10);
+    }
+
+    .exercise-form {
+        grid-template-columns: 1fr;
+    }
+
+    .exercise-form button {
+        width: 100%;
+    }
+
+    .exercise-item {
+        flex-direction: column;
+    }
+
+    .exercise-actions,
+    .workout-card-actions {
+        width: 100%;
+    }
+
+    .exercise-actions button,
+    .workout-card-actions button,
+    .workout-card-actions a {
+        flex: 1 1 140px;
+    }
+}
