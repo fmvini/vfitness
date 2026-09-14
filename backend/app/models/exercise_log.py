@@ -14,7 +14,7 @@ from __future__ import annotations
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime, ForeignKey, Numeric, String
+from sqlalchemy import Boolean, DateTime, ForeignKey, Numeric, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -49,14 +49,20 @@ class ExerciseLog(Base):
         ForeignKey("users.id", ondelete="CASCADE"), nullable=False, index=True
     )
 
-    performed_sets: Mapped[int] = mapped_column(nullable=False)
+    performed_sets: Mapped[int | None] = mapped_column(nullable=True)
 
     # String para acomodar tanto um valor unico ("10") quanto repeticoes
     # que variaram entre series ("10,9,8")
-    performed_reps: Mapped[str] = mapped_column(String(20), nullable=False)
+    performed_reps: Mapped[str | None] = mapped_column(String(20), nullable=True)
 
     # Carga efetivamente usada na execucao, em kg
-    performed_load: Mapped[float] = mapped_column(Numeric(6, 2), nullable=False)
+    performed_load: Mapped[float | None] = mapped_column(Numeric(6, 2), nullable=True)
+
+    load_per_dumbbell: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False
+    )
+
+    performed_duration_minutes: Mapped[int | None] = mapped_column(nullable=True)
 
     performed_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

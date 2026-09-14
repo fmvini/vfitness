@@ -16,11 +16,18 @@ from pydantic import BaseModel, ConfigDict, Field
 class ExerciseLogBase(BaseModel):
     """Campos comuns ao registrar a execucao real de um exercicio."""
 
-    performed_sets: int = Field(..., gt=0)
+    performed_sets: int | None = Field(default=None, gt=0)
     # String para acomodar tanto um valor unico ("10") quanto repeticoes
     # que variaram entre series ("10,9,8")
-    performed_reps: str = Field(..., min_length=1, max_length=20)
-    performed_load: float = Field(..., ge=0)
+    performed_reps: str | None = Field(
+        default=None,
+        min_length=1,
+        max_length=20,
+        pattern=r"^\d+(\s*,\s*\d+)*$",
+    )
+    performed_load: float | None = Field(default=None, ge=0)
+    performed_duration_minutes: int | None = Field(default=None, gt=0)
+    load_per_dumbbell: bool = False
 
 
 class ExerciseLogCreate(ExerciseLogBase):
@@ -52,6 +59,8 @@ class ExerciseLogUpdate(BaseModel):
     performed_sets: int | None = Field(default=None, gt=0)
     performed_reps: str | None = Field(default=None, min_length=1, max_length=20)
     performed_load: float | None = Field(default=None, ge=0)
+    performed_duration_minutes: int | None = Field(default=None, gt=0)
+    load_per_dumbbell: bool | None = None
     performed_at: datetime | None = None
 
 

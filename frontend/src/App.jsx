@@ -8,6 +8,8 @@ import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import DashboardPage from './pages/DashboardPage'
 import WorkoutDetailPage from './pages/WorkoutDetailPage'
+import WorkoutSessionPage from './pages/WorkoutSessionPage'
+import TodayWorkoutPage from './pages/TodayWorkoutPage'
 import StatsPage from './pages/StatsPage'
 
 function ProtectedRoute({ children }) {
@@ -40,7 +42,12 @@ function PublicRoute({ children }) {
 
 export default function App() {
     return (
-        <BrowserRouter>
+        <BrowserRouter
+            future={{
+                v7_startTransition: true,
+                v7_relativeSplatPath: true
+            }}
+        >
             <Navbar />
 
             <Routes>
@@ -72,12 +79,35 @@ export default function App() {
                 />
 
                 <Route
-                    path="/workouts/:id"
+                    path="/workouts/:id/edit"
                     element={
                         <ProtectedRoute>
                             <WorkoutDetailPage />
                         </ProtectedRoute>
                     }
+                />
+
+                <Route
+                    path="/workouts/:id/session"
+                    element={
+                        <ProtectedRoute>
+                            <WorkoutSessionPage />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/today"
+                    element={
+                        <ProtectedRoute>
+                            <TodayWorkoutPage />
+                        </ProtectedRoute>
+                    }
+                />
+
+                <Route
+                    path="/workouts/:id"
+                    element={<Navigate to="/" replace />}
                 />
 
                 <Route

@@ -71,8 +71,8 @@ def login_with_google(payload: GoogleLoginRequest, db: Session = Depends(get_db)
     se for o primeiro acesso ou associando a um usuario ja existente com o
     mesmo email (secao 2.1 e Fase 9 do escopo).
 
-    Implementacao prevista para a Fase 9, apos o login tradicional estar
-    funcionando de ponta a ponta.
+    O frontend envia o credential emitido pelo Google Identity Services e
+    o backend valida audiencia, assinatura e validade antes de autenticar.
     """
     return authenticate_or_create_google_user(db, payload.id_token)
 

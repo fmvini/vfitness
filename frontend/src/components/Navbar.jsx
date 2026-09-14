@@ -29,6 +29,10 @@ export default function Navbar() {
                     Dashboard
                 </Link>
 
+                <Link to="/today">
+                    Treino do dia
+                </Link>
+
                 <Link to="/stats">
                     Estatísticas
                 </Link>

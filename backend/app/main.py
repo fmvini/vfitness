@@ -3,18 +3,15 @@ main.py
 
 Ponto de entrada da API FastAPI do VFitness.
 
-Nesta etapa (Fase 0 do escopo), a aplicacao expoe apenas a rota de
-verificacao de saude (/health), usada para validar que o backend sobe
-corretamente e consegue se comunicar com o frontend.
-
-Os routers de negocio (auth, workouts, exercises, stats) serao registrados
-aqui nas fases seguintes, quando app/routers/ for implementado.
+A aplicacao expoe a verificacao de saude e os recursos de autenticacao,
+treinos, exercicios, registros de execucao e estatisticas.
 """
 
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.config import settings
+from app.routers import auth_router, exercise_router, stats_router, workout_router
 
 app = FastAPI(
     title=settings.app_name,
@@ -51,12 +48,8 @@ def health_check() -> dict:
     }
 
 
-# --- Registro de routers (proximas fases) ---
-# A medida que os recursos forem implementados, registrar aqui, por exemplo:
-#
-# from app.routers import auth_router, workout_router, exercise_router, stats_router
-#
-# app.include_router(auth_router.router, prefix="/auth", tags=["auth"])
-# app.include_router(workout_router.router, prefix="/workouts", tags=["workouts"])
-# app.include_router(exercise_router.router, prefix="/exercises", tags=["exercises"])
-# app.include_router(stats_router.router, prefix="/stats", tags=["stats"])
+# --- Registro de routers ---
+app.include_router(auth_router.router, prefix="/auth", tags=["auth"])
+app.include_router(workout_router.router, prefix="/workouts", tags=["workouts"])
+app.include_router(exercise_router.router, tags=["exercises"])
+app.include_router(stats_router.router, prefix="/stats", tags=["stats"])

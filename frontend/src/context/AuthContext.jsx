@@ -8,6 +8,7 @@ import {
 import {
     login as loginRequest,
     register as registerRequest,
+    loginWithGoogle as googleLoginRequest,
     logout as logoutRequest,
     getCurrentUser
 } from '../api/authApi'
@@ -57,11 +58,22 @@ export function AuthProvider({ children }) {
     }
 
     async function register(name, email, password) {
-        return await registerRequest({
+        const response = await registerRequest({
             name,
             email,
             password
         })
+
+        const userData = await getCurrentUser()
+        setUser(userData)
+        return response
+    }
+
+    async function loginWithGoogle(credential) {
+        const response = await googleLoginRequest(credential)
+        const userData = await getCurrentUser()
+        setUser(userData)
+        return response
     }
 
     function logout() {
@@ -75,6 +87,7 @@ export function AuthProvider({ children }) {
         isAuthenticated,
         login,
         register,
+        loginWithGoogle,
         logout
     }
 

@@ -29,6 +29,7 @@ from app.database import get_db
 from app.models.user import User
 from app.services.auth_service import get_current_user
 from app.services.stats_service import (
+    get_dashboard_stats,
     get_exercise_progress,
     get_top_progress_exercises,
     get_total_weight_lifted,
@@ -39,7 +40,7 @@ router = APIRouter()
 
 # "dia" so se aplica ao peso total levantado; os graficos de evolucao e a
 # frequencia comparam apenas semana ou mes (secao 2.6).
-Period = Literal["day", "week", "month"]
+Period = Literal["day", "week", "month", "year"]
 ProgressPeriod = Literal["week", "month"]
 
 
@@ -85,7 +86,21 @@ class TrainingFrequencyResponse(BaseModel):
     days_in_period: int
 
 
+class DashboardStatsResponse(BaseModel):
+    total_workouts: int
+    total_exercises: int
+    active_exercises: int
+
+
 # --- Rotas ---
+
+
+@router.get("/dashboard", response_model=DashboardStatsResponse)
+def dashboard(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+) -> DashboardStatsResponse:
+    return get_dashboard_stats(db, user_id=current_user.id)
 
 
 @router.get("/total-weight", response_model=TotalWeightResponse)

@@ -31,7 +31,7 @@ export default function ProgressChart({
                 <LineChart data={data}>
                     <CartesianGrid strokeDasharray="3 3" />
 
-                    <XAxis dataKey="date" />
+                    <XAxis dataKey="recorded_at" />
 
                     <YAxis />
 
@@ -39,7 +39,7 @@ export default function ProgressChart({
 
                     <Line
                         type="monotone"
-                        dataKey="load"
+                        dataKey="load_kg"
                         stroke="#2563eb"
                         strokeWidth={3}
                     />

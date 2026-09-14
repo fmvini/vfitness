@@ -1,67 +1,64 @@
-"""
-schemas/exercise_schema.py
-
-Schemas Pydantic para validacao de entrada e saida relacionadas ao
-Exercise (exercicio dentro de um treino): criacao, edicao, reordenacao e
-leitura (secao 2.3 do escopo).
-"""
-
 from __future__ import annotations
 
-from pydantic import BaseModel, ConfigDict, Field
+from typing import Literal
+
+from pydantic import BaseModel, ConfigDict, Field, model_validator
+
+ExerciseKind = Literal["resistance", "cardio"]
 
 
 class ExerciseBase(BaseModel):
-    """Campos comuns a criacao e edicao de um exercicio."""
-
     name: str = Field(..., min_length=1, max_length=120)
-    target_sets: int = Field(..., gt=0)
-    # Aceita um valor fixo ("12") ou uma faixa ("8-12"), conforme secao 2.3
-    target_reps: str = Field(..., min_length=1, max_length=20)
-    # Carga planejada, em kg. Opcional: ver nota em models/exercise.py
-    # sobre a divergencia entre as secoes 2.3 e 4.4 do escopo original.
-    target_load: float | None = Field(default=None, ge=0)
-    target_rest_seconds: int = Field(..., ge=0)
-
-
-class ExerciseCreate(ExerciseBase):
-    """
-    Dados recebidos ao adicionar um exercicio a um treino.
-
-    order_index e opcional: quando nao informado, o backend deve calcular
-    automaticamente a proxima posicao disponivel dentro do treino.
-    """
-
-    order_index: int | None = None
-
-
-class ExerciseUpdate(BaseModel):
-    """
-    Dados recebidos na edicao de um exercicio existente (secao 2.3).
-    Todos os campos sao opcionais, permitindo atualizar apenas o que mudou.
-    """
-
-    name: str | None = Field(default=None, min_length=1, max_length=120)
+    kind: ExerciseKind = "resistance"
     target_sets: int | None = Field(default=None, gt=0)
     target_reps: str | None = Field(default=None, min_length=1, max_length=20)
     target_load: float | None = Field(default=None, ge=0)
+    load_per_dumbbell: bool = False
     target_rest_seconds: int | None = Field(default=None, ge=0)
-    order_index: int | None = None
+    cardio_duration_minutes: int | None = Field(default=None, gt=0)
+
+    @model_validator(mode="after")
+    def validate_kind_fields(self) -> "ExerciseBase":
+        if self.kind == "cardio":
+            if self.cardio_duration_minutes is None:
+                raise ValueError("Informe o tempo do cardio em minutos.")
+            self.target_sets = None
+            self.target_reps = None
+            self.target_load = None
+            self.load_per_dumbbell = False
+            self.target_rest_seconds = None
+            return self
+
+        if self.target_sets is None or self.target_reps is None:
+            raise ValueError("Informe series e repeticoes do exercicio.")
+        if self.target_rest_seconds is None:
+            raise ValueError("Informe o tempo de descanso do exercicio.")
+        self.cardio_duration_minutes = None
+        return self
+
+
+class ExerciseCreate(ExerciseBase):
+    order_index: int | None = Field(default=None, ge=0)
+
+
+class ExerciseUpdate(BaseModel):
+    name: str | None = Field(default=None, min_length=1, max_length=120)
+    kind: ExerciseKind | None = None
+    target_sets: int | None = Field(default=None, gt=0)
+    target_reps: str | None = Field(default=None, min_length=1, max_length=20)
+    target_load: float | None = Field(default=None, ge=0)
+    load_per_dumbbell: bool | None = None
+    target_rest_seconds: int | None = Field(default=None, ge=0)
+    cardio_duration_minutes: int | None = Field(default=None, gt=0)
+    order_index: int | None = Field(default=None, ge=0)
 
 
 class ExerciseReorder(BaseModel):
-    """
-    Payload para reordenar exercicios dentro de um treino.
-    Funcionalidade opcional, prevista para fase avancada (secao 2.3).
-    """
-
     exercise_id: int
     order_index: int = Field(..., ge=0)
 
 
 class ExerciseRead(ExerciseBase):
-    """Dados de um exercicio retornados pela API."""
-
     id: int
     workout_id: int
     order_index: int

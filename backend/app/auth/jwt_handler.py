@@ -16,7 +16,7 @@ def create_access_token(
 
     expire = datetime.now(timezone.utc) + timedelta(
         minutes=expires_minutes
-        or settings.ACCESS_TOKEN_EXPIRE_MINUTES
+        or settings.access_token_expire_minutes
     )
 
     payload.update(
@@ -27,8 +27,8 @@ def create_access_token(
 
     return jwt.encode(
         payload,
-        settings.SECRET_KEY,
-        algorithm=ALGORITHM,
+        settings.secret_key,
+        algorithm=settings.algorithm,
     )
 
 
@@ -38,8 +38,8 @@ def decode_access_token(
     try:
         payload = jwt.decode(
             token,
-            settings.SECRET_KEY,
-            algorithms=[ALGORITHM],
+            settings.secret_key,
+            algorithms=[settings.algorithm],
         )
 
         return payload

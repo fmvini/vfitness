@@ -26,7 +26,7 @@ export async function getExerciseProgress(
     period = 'month'
 ) {
     const response = await client.get(
-        `/stats/exercise/${exerciseId}?period=${period}`
+        `/stats/exercises/${exerciseId}/progress?period=${period}`
     )
 
     return response.data

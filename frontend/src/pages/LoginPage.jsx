@@ -1,10 +1,11 @@
 import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import GoogleLoginButton from '../components/GoogleLoginButton'
 
 export default function LoginPage() {
     const navigate = useNavigate()
-    const { login } = useAuth()
+    const { login, loginWithGoogle } = useAuth()
 
     const [email, setEmail] = useState('')
     const [password, setPassword] = useState('')
@@ -25,6 +26,22 @@ export default function LoginPage() {
             setError(
                 err.response?.data?.detail ||
                 'Email ou senha inválidos.'
+            )
+        } finally {
+            setLoading(false)
+        }
+    }
+
+    async function handleGoogleLogin(credential) {
+        try {
+            setLoading(true)
+            setError('')
+            await loginWithGoogle(credential)
+            navigate('/')
+        } catch (err) {
+            setError(
+                err.response?.data?.detail ||
+                'Não foi possível entrar com o Google.'
             )
         } finally {
             setLoading(false)
@@ -58,6 +75,11 @@ export default function LoginPage() {
                     {loading ? 'Entrando...' : 'Entrar'}
                 </button>
             </form>
+
+            <GoogleLoginButton
+                onCredential={handleGoogleLogin}
+                disabled={loading}
+            />
 
             <p>
                 Não possui conta?{' '}

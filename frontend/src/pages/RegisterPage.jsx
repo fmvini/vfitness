@@ -27,7 +27,7 @@ export default function RegisterPage() {
 
             await register(name, email, password)
 
-            navigate('/login')
+            navigate('/')
         } catch (err) {
             setError(
                 err.response?.data?.detail ||

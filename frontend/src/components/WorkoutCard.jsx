@@ -2,7 +2,9 @@ import { Link } from 'react-router-dom'
 
 export default function WorkoutCard({
     workout,
-    onDelete
+    onDelete,
+    onEdit,
+    isToday = false
 }) {
     function handleDelete() {
         const confirmed = window.confirm(
@@ -15,7 +17,8 @@ export default function WorkoutCard({
     }
 
     return (
-        <div className="workout-card">
+        <div className={`workout-card${isToday ? ' workout-card-today' : ''}`}>
+            {isToday && <span className="today-label">Treino de hoje</span>}
             <h3>{workout.name}</h3>
 
             <p>
@@ -23,9 +26,23 @@ export default function WorkoutCard({
             </p>
 
             <div className="workout-card-actions">
-                <Link to={`/workouts/${workout.id}`}>
-                    Abrir
+                <Link to={`/workouts/${workout.id}/session`}>
+                    Abrir treino
                 </Link>
+
+                <Link
+                    to={`/workouts/${workout.id}/edit`}
+                    className="button-secondary"
+                >
+                    Exercícios
+                </Link>
+
+                <button
+                    type="button"
+                    onClick={() => onEdit(workout)}
+                >
+                    Editar
+                </button>
 
                 <button
                     type="button"

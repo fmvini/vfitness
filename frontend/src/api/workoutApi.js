@@ -16,7 +16,7 @@ export async function createWorkout(workoutData) {
 }
 
 export async function updateWorkout(workoutId, workoutData) {
-    const response = await client.put(
+    const response = await client.patch(
         `/workouts/${workoutId}`,
         workoutData
     )
@@ -39,7 +39,7 @@ export async function createExercise(workoutId, exerciseData) {
 }
 
 export async function updateExercise(exerciseId, exerciseData) {
-    const response = await client.put(
+    const response = await client.patch(
         `/exercises/${exerciseId}`,
         exerciseData
     )
@@ -55,10 +55,30 @@ export async function deleteExercise(exerciseId) {
     return response.data
 }
 
-export async function registerExerciseLog(logData) {
+export async function registerExerciseLog(exerciseId, logData) {
     const response = await client.post(
-        '/exercise-logs',
+        `/exercises/${exerciseId}/logs`,
         logData
+    )
+
+    return response.data
+}
+
+export async function reorderExercises(workoutId, exercises) {
+    const response = await client.patch(
+        `/workouts/${workoutId}/exercises/reorder`,
+        exercises.map((exercise, index) => ({
+            exercise_id: exercise.id,
+            order_index: index
+        }))
+    )
+
+    return response.data
+}
+
+export async function getExerciseLogs(exerciseId) {
+    const response = await client.get(
+        `/exercises/${exerciseId}/logs`
     )
 
     return response.data

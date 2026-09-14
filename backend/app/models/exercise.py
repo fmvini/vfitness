@@ -19,7 +19,7 @@ from __future__ import annotations
 
 from typing import TYPE_CHECKING
 
-from sqlalchemy import ForeignKey, Numeric, String
+from sqlalchemy import Boolean, ForeignKey, Numeric, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.database import Base
@@ -49,17 +49,27 @@ class Exercise(Base):
 
     name: Mapped[str] = mapped_column(String(120), nullable=False)
 
-    target_sets: Mapped[int] = mapped_column(nullable=False)
+    kind: Mapped[str] = mapped_column(
+        String(20), nullable=False, default="resistance"
+    )
+
+    target_sets: Mapped[int | None] = mapped_column(nullable=True)
 
     # String para suportar tanto um valor fixo ("12") quanto uma faixa
     # de repeticoes ("8-12"), conforme secao 2.3
-    target_reps: Mapped[str] = mapped_column(String(20), nullable=False)
+    target_reps: Mapped[str | None] = mapped_column(String(20), nullable=True)
 
     # Carga planejada, em kg. Ver nota no topo do arquivo sobre a
     # divergencia entre as secoes 2.3 e 4.4 do escopo.
     target_load: Mapped[float | None] = mapped_column(Numeric(6, 2), nullable=True)
 
-    target_rest_seconds: Mapped[int] = mapped_column(nullable=False)
+    load_per_dumbbell: Mapped[bool] = mapped_column(
+        Boolean, nullable=False, default=False
+    )
+
+    target_rest_seconds: Mapped[int | None] = mapped_column(nullable=True)
+
+    cardio_duration_minutes: Mapped[int | None] = mapped_column(nullable=True)
 
     # Posicao do exercicio dentro do treino, usada para reordenar
     # (funcionalidade opcional prevista para fase avancada, secao 2.3)

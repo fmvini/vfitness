@@ -1,18 +1,22 @@
 import client from './client'
 
+function persistToken(data) {
+    if (data.access_token) {
+        localStorage.setItem('token', data.access_token)
+    }
+
+    return data
+}
+
 export async function register(userData) {
     const response = await client.post('/auth/register', userData)
-    return response.data
+    return persistToken(response.data)
 }
 
 export async function login(credentials) {
     const response = await client.post('/auth/login', credentials)
 
-    if (response.data.access_token) {
-        localStorage.setItem('token', response.data.access_token)
-    }
-
-    return response.data
+    return persistToken(response.data)
 }
 
 export async function logout() {
@@ -26,8 +30,8 @@ export async function getCurrentUser() {
 
 export async function loginWithGoogle(token) {
     const response = await client.post('/auth/google', {
-        token
+        id_token: token
     })
 
-    return response.data
+    return persistToken(response.data)
 }
