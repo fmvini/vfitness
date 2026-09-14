@@ -56,3 +56,39 @@ VITE_GOOGLE_CLIENT_ID=seu-client-id.apps.googleusercontent.com
 Reinicie a API e o Vite depois de alterar variaveis de ambiente. O fluxo
 atual usa o Google Identity Services e valida o ID token no backend, por isso
 nao precisa de Client Secret nem URI de callback em ambiente local.
+
+## Deploy na Vercel com Supabase
+
+O projeto esta dividido em dois deploys:
+
+- Frontend: `https://vfitness-frontend.vercel.app`
+- Backend: `https://vfitness-backend.vercel.app`
+
+No projeto do frontend na Vercel, configure:
+
+```dotenv
+VITE_API_URL=https://vfitness-backend.vercel.app
+```
+
+No projeto do backend na Vercel, configure:
+
+```dotenv
+ENVIRONMENT=production
+DEBUG=false
+SECRET_KEY=gere-uma-chave-longa-e-aleatoria
+CORS_ORIGINS=["https://vfitness-frontend.vercel.app"]
+DATABASE_URL=postgresql://postgres:<senha>@db.qcjhtkiohtmmvpnjcvvw.supabase.co:5432/postgres?sslmode=require
+```
+
+A URL publica do projeto Supabase (`https://qcjhtkiohtmmvpnjcvvw.supabase.co`)
+nao substitui a `DATABASE_URL`: o backend precisa da connection string do
+Postgres, encontrada no painel do Supabase em Project Settings > Database.
+
+Depois de configurar a `DATABASE_URL`, execute as migracoes do Alembic contra
+o banco online antes de usar o app em producao:
+
+```powershell
+cd backend
+$env:DATABASE_URL="postgresql://postgres:<senha>@db.qcjhtkiohtmmvpnjcvvw.supabase.co:5432/postgres?sslmode=require"
+..\.venv\Scripts\python.exe -m alembic upgrade head
+```

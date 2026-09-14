@@ -4,14 +4,16 @@ from alembic import context
 from sqlalchemy import engine_from_config, pool
 
 from app.config import settings
-from app.database import Base
+from app.database import Base, normalize_database_url
 from app.models.exercise import Exercise
 from app.models.exercise_log import ExerciseLog
 from app.models.user import User
 from app.models.workout import Workout
 
 config = context.config
-config.set_main_option("sqlalchemy.url", settings.database_url)
+database_url = normalize_database_url(settings.database_url)
+# ConfigParser interpreta %, inclusive senhas escapadas na connection string.
+config.set_main_option("sqlalchemy.url", database_url.replace("%", "%%"))
 
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
@@ -21,7 +23,7 @@ target_metadata = Base.metadata
 
 def run_migrations_offline() -> None:
     context.configure(
-        url=settings.database_url,
+        url=database_url,
         target_metadata=target_metadata,
         literal_binds=True,
         dialect_opts={"paramstyle": "named"},

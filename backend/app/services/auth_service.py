@@ -151,7 +151,11 @@ def get_current_user(
     if user_id is None:
         raise _credentials_error()
 
-    user = db.get(User, int(user_id))
+    try:
+        user_id = int(user_id)
+    except (ValueError, TypeError):
+        raise _credentials_error() from None
+    user = db.get(User, user_id)
     if user is None:
         raise _credentials_error()
 

@@ -37,7 +37,7 @@ def verify_google_id_token(credential: str) -> GoogleUserInfo | None:
 
     email = payload.get("email")
     sub = payload.get("sub")
-    if not email or not sub:
+    if not email or not sub or payload.get("email_verified") is not True:
         return None
 
     return GoogleUserInfo(

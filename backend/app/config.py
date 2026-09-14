@@ -7,7 +7,9 @@ arquivo .env na raiz do backend (ver .env.example).
 """
 
 from functools import lru_cache
+from pathlib import Path
 
+from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -15,7 +17,7 @@ class Settings(BaseSettings):
     # --- Aplicacao ---
     app_name: str = "VFitness API"
     environment: str = "development"  # development | production
-    debug: bool = True
+    debug: bool = False
 
     # --- Banco de dados (PostgreSQL) ---
     # Formato: postgresql+psycopg2://usuario:senha@host:porta/nome_do_banco
@@ -39,10 +41,20 @@ class Settings(BaseSettings):
     cors_origins: list[str] = [
         "http://localhost:5173",  # Vite dev server
         "http://127.0.0.1:5173",
+        "https://vfitness-frontend.vercel.app",
     ]
 
+    @model_validator(mode="after")
+    def validate_production(self) -> "Settings":
+        if self.environment == "production":
+            if len(self.secret_key) < 32 or self.secret_key == "change-this-secret-key":
+                raise ValueError("Configure uma SECRET_KEY aleatoria com pelo menos 32 caracteres.")
+            if self.debug:
+                raise ValueError("DEBUG deve ser false em producao.")
+        return self
+
     model_config = SettingsConfigDict(
-        env_file=".env",
+        env_file=Path(__file__).resolve().parents[1] / ".env",
         env_file_encoding="utf-8",
         extra="ignore",
     )

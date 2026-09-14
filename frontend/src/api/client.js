@@ -1,7 +1,25 @@
 import axios from 'axios'
 
+const LOCAL_API_URL = 'http://localhost:8000'
+const PRODUCTION_API_URL = 'https://vfitness-backend.vercel.app'
+
+function resolveApiUrl() {
+    if (import.meta.env.VITE_API_URL) {
+        return import.meta.env.VITE_API_URL
+    }
+
+    if (
+        typeof window !== 'undefined' &&
+        window.location.hostname === 'vfitness-frontend.vercel.app'
+    ) {
+        return PRODUCTION_API_URL
+    }
+
+    return LOCAL_API_URL
+}
+
 const client = axios.create({
-    baseURL: import.meta.env.VITE_API_URL || 'http://localhost:8000',
+    baseURL: resolveApiUrl(),
     headers: {
         'Content-Type': 'application/json'
     }

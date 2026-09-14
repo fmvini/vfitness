@@ -153,7 +153,7 @@ def update_exercise(
     except ValidationError as exc:
         raise HTTPException(
             status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
-            detail=exc.errors(),
+            detail=exc.errors(include_context=False),
         ) from exc
 
     for field, value in validated.model_dump(exclude={"order_index"}).items():
@@ -230,6 +230,7 @@ def create_exercise_log(
         data = {
             "performed_duration_minutes": duration,
             "load_per_dumbbell": False,
+            **({"performed_at": data["performed_at"]} if "performed_at" in data else {}),
         }
     else:
         required = ("performed_sets", "performed_reps", "performed_load")

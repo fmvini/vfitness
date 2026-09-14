@@ -10,7 +10,7 @@ from __future__ import annotations
 
 from datetime import datetime
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from app.models.workout import Weekday
 from app.schemas.exercise_schema import ExerciseRead
@@ -40,6 +40,13 @@ class WorkoutUpdate(BaseModel):
 
     name: str | None = Field(default=None, min_length=1, max_length=120)
     weekday: Weekday | None = None
+
+    @field_validator("name")
+    @classmethod
+    def name_cannot_be_null(cls, value: str | None) -> str:
+        if value is None:
+            raise ValueError("Informe o nome do treino.")
+        return value
 
 
 class WorkoutRead(WorkoutBase):

@@ -63,6 +63,7 @@ build/
 .parcel-cache/
 
 # Local secrets
+.vercel/
 .env
 .env.*
 !.env.example

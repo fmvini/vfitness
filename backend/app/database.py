@@ -9,16 +9,34 @@ from collections.abc import Generator
 
 from sqlalchemy import create_engine
 from sqlalchemy.orm import DeclarativeBase, Session, sessionmaker
+from sqlalchemy.pool import NullPool
 
 from app.config import settings
+
+
+def normalize_database_url(database_url: str) -> str:
+    """
+    SQLAlchemy 2 expects the canonical postgresql:// dialect name.
+
+    Some hosted providers and dashboards still show postgres:// connection
+    strings, so normalize that common variant before creating the engine.
+    """
+    if database_url.startswith("postgres://"):
+        return database_url.replace("postgres://", "postgresql://", 1)
+
+    return database_url
+
 
 # Engine: ponto central de conexao com o banco de dados.
 # pool_pre_ping evita erros de conexao "caida" apos periodos de inatividade
 # (comum em bancos hospedados na nuvem, ex: Render/Railway).
 engine = create_engine(
-    settings.database_url,
+    normalize_database_url(settings.database_url),
     pool_pre_ping=True,
     echo=settings.debug,
+    # Supabase gerencia o pool; cada instancia serverless libera a conexao.
+    **({"poolclass": NullPool, "connect_args": {"connect_timeout": 10}}
+       if settings.environment == "production" else {}),
 )
 
 # Fabrica de sessoes. Cada requisicao da API deve usar sua propria sessao,

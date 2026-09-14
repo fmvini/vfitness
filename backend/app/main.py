@@ -7,10 +7,14 @@ A aplicacao expoe a verificacao de saude e os recursos de autenticacao,
 treinos, exercicios, registros de execucao e estatisticas.
 """
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy import text
+from sqlalchemy.exc import SQLAlchemyError
+from sqlalchemy.orm import Session
 
 from app.config import settings
+from app.database import get_db
 from app.routers import auth_router, exercise_router, stats_router, workout_router
 
 app = FastAPI(
@@ -49,6 +53,17 @@ def health_check() -> dict:
 
 
 # --- Registro de routers ---
+@app.get("/health/ready", tags=["health"])
+def readiness_check(db: Session = Depends(get_db)) -> dict:
+    """Confirma a conexao e a presenca das tabelas usadas pelo aplicativo."""
+    try:
+        for table in ("users", "workouts", "exercises", "exercise_logs"):
+            db.execute(text(f"SELECT 1 FROM {table} LIMIT 0"))
+    except SQLAlchemyError:
+        raise HTTPException(status_code=503, detail="Banco de dados indisponivel.") from None
+    return {"status": "ok", "database": "ok"}
+
+
 app.include_router(auth_router.router, prefix="/auth", tags=["auth"])
 app.include_router(workout_router.router, prefix="/workouts", tags=["workouts"])
 app.include_router(exercise_router.router, tags=["exercises"])
