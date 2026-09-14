@@ -22,7 +22,8 @@ export default function Navbar() {
                     to="/"
                     className="navbar-logo"
                 >
-                    VFitness
+                    <img src="/vfitness-mark.png" alt="" />
+                    <span>VFitness</span>
                 </Link>
 
                 <Link to="/">

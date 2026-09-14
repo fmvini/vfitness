@@ -19,9 +19,6 @@ export default function ExerciseItem({
 
     return (
         <div className="exercise-item">
-            <span className="drag-handle" title="Arrastar para reordenar" aria-hidden="true">
-                ::
-            </span>
             <div className="exercise-info">
                 <div className="exercise-title-row">
                     <h3>{exercise.name}</h3>

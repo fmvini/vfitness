@@ -4,9 +4,9 @@ import { Link, useParams } from 'react-router-dom'
 import { getWorkoutById, registerExerciseLog } from '../api/workoutApi'
 import { getWeekdayLabel } from '../utils/weekdayDetector'
 
-function repetitionTarget(value) {
-    const numbers = String(value || '').match(/\d+/g)?.map(Number) || [1]
-    return Math.max(...numbers, 1)
+function plannedRepetitions(value) {
+    const repetitions = Number(String(value || '').match(/\d+/)?.[0])
+    return Math.max(repetitions || 1, 1)
 }
 
 function createExerciseProgress(exercise) {
@@ -17,15 +17,40 @@ function createExerciseProgress(exercise) {
         }
     }
 
-    const repetitions = repetitionTarget(exercise.target_reps)
     return {
         complete: false,
         load: exercise.target_load ?? 0,
-        sets: Array.from(
-            { length: exercise.target_sets },
-            () => Array.from({ length: repetitions }, () => false)
-        )
+        sets: Array.from({ length: exercise.target_sets }, () => false)
     }
+}
+
+function mergeStoredProgress(exercises, initial, storedProgress) {
+    return Object.fromEntries(exercises.map((exercise) => {
+        const base = initial[exercise.id]
+        const stored = storedProgress?.[exercise.id]
+        if (!stored) {
+            return [exercise.id, base]
+        }
+
+        if (exercise.kind === 'cardio') {
+            return [exercise.id, { ...base, ...stored }]
+        }
+
+        const storedSets = Array.isArray(stored.sets) ? stored.sets : []
+        const sets = base.sets.map((_, index) => {
+            const savedSet = storedSets[index]
+            return Array.isArray(savedSet)
+                ? savedSet.length > 0 && savedSet.every(Boolean)
+                : Boolean(savedSet)
+        })
+
+        return [exercise.id, {
+            ...base,
+            ...stored,
+            sets,
+            complete: sets.length > 0 && sets.every(Boolean)
+        }]
+    }))
 }
 
 function localDateKey() {
@@ -64,7 +89,7 @@ export default function WorkoutSessionPage() {
                     localStorage.removeItem(storageKey)
                 }
                 setWorkout(data)
-                setProgress({ ...initial, ...(stored?.progress || {}) })
+                setProgress(mergeStoredProgress(data.exercises, initial, stored?.progress))
                 setFinished(Boolean(stored?.finished))
             } catch (err) {
                 setError(
@@ -109,24 +134,20 @@ export default function WorkoutSessionPage() {
             return {
                 ...current,
                 complete,
-                sets: current.sets.map((set) => set.map(() => complete))
+                sets: current.sets.map(() => complete)
             }
         })
     }
 
-    function toggleRepetition(exerciseId, setIndex, repetitionIndex) {
+    function toggleSeries(exerciseId, setIndex) {
         updateProgress(exerciseId, (current) => {
-            const sets = current.sets.map((set, currentSetIndex) =>
-                set.map((checked, currentRepetitionIndex) =>
-                    currentSetIndex === setIndex && currentRepetitionIndex === repetitionIndex
-                        ? !checked
-                        : checked
-                )
+            const sets = current.sets.map((checked, currentSetIndex) =>
+                currentSetIndex === setIndex ? !checked : checked
             )
             return {
                 ...current,
                 sets,
-                complete: sets.every((set) => set.every(Boolean))
+                complete: sets.every(Boolean)
             }
         })
     }
@@ -151,12 +172,9 @@ export default function WorkoutSessionPage() {
                     })
                 }
 
-                const repetitions = activityProgress.sets.map(
-                    (set) => set.filter(Boolean).length
-                )
                 return registerExerciseLog(exercise.id, {
-                    performed_sets: repetitions.length,
-                    performed_reps: repetitions.join(','),
+                    performed_sets: activityProgress.sets.filter(Boolean).length,
+                    performed_reps: String(plannedRepetitions(exercise.target_reps)),
                     performed_load: Number(activityProgress.load)
                 })
             }))
@@ -304,28 +322,20 @@ export default function WorkoutSessionPage() {
                                             <span>{exercise.target_rest_seconds}s de descanso</span>
                                         </div>
 
-                                        <div className="sets-list">
-                                            {activityProgress.sets.map((set, setIndex) => (
-                                                <div key={setIndex} className="set-row">
-                                                    <strong>Série {setIndex + 1}</strong>
-                                                    <div className="repetition-checks">
-                                                        {set.map((checked, repetitionIndex) => (
-                                                            <label key={repetitionIndex}>
-                                                                <input
-                                                                    type="checkbox"
-                                                                    checked={checked}
-                                                                    disabled={finished}
-                                                                    onChange={() => toggleRepetition(
-                                                                        exercise.id,
-                                                                        setIndex,
-                                                                        repetitionIndex
-                                                                    )}
-                                                                />
-                                                                <span>{repetitionIndex + 1}</span>
-                                                            </label>
-                                                        ))}
-                                                    </div>
-                                                </div>
+                                        <div className="series-checks" aria-label="Séries realizadas">
+                                            {activityProgress.sets.map((checked, setIndex) => (
+                                                <label key={setIndex} className="series-check">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={checked}
+                                                        disabled={finished}
+                                                        onChange={() => toggleSeries(
+                                                            exercise.id,
+                                                            setIndex
+                                                        )}
+                                                    />
+                                                    <span>Série {setIndex + 1}</span>
+                                                </label>
                                             ))}
                                         </div>
                                     </>

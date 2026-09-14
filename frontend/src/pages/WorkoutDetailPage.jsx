@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 
 import {
@@ -21,6 +21,7 @@ export default function WorkoutDetailPage() {
     const [loading, setLoading] = useState(true)
     const [message, setMessage] = useState('')
     const [error, setError] = useState('')
+    const editorRef = useRef(null)
 
     useEffect(() => {
         loadWorkout()
@@ -109,6 +110,16 @@ export default function WorkoutDetailPage() {
         setDraggedId(null)
     }
 
+    function startEditing(exercise) {
+        setEditingExercise(exercise)
+        requestAnimationFrame(() => {
+            editorRef.current?.scrollIntoView({
+                behavior: 'smooth',
+                block: 'start'
+            })
+        })
+    }
+
     if (loading) {
         return <main className="workout-detail-page"><p>Carregando treino...</p></main>
     }
@@ -135,7 +146,7 @@ export default function WorkoutDetailPage() {
                 </Link>
             </div>
 
-            <section className="editor-section">
+            <section ref={editorRef} className="editor-section">
                 <h2>{editingExercise ? 'Editar atividade' : 'Adicionar atividade'}</h2>
                 <ExerciseForm
                     key={editingExercise?.id || `new-${exerciseFormVersion}`}
@@ -179,7 +190,7 @@ export default function WorkoutDetailPage() {
                     >
                         <ExerciseItem
                             exercise={exercise}
-                            onEdit={setEditingExercise}
+                            onEdit={startEditing}
                             onDelete={removeExercise}
                             onMoveUp={() => moveExercise(index, index - 1)}
                             onMoveDown={() => moveExercise(index, index + 1)}

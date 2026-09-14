@@ -50,6 +50,10 @@ export default function LoginPage() {
 
     return (
         <div className="auth-page">
+            <div className="auth-brand" aria-label="VFitness">
+                <img src="/vfitness-mark.png" alt="" />
+                <span>VFitness</span>
+            </div>
             <h1>Entrar</h1>
 
             <form onSubmit={handleSubmit}>
