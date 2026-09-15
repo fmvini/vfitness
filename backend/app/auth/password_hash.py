@@ -2,7 +2,8 @@ from passlib.context import CryptContext
 
 
 pwd_context = CryptContext(
-    schemes=["bcrypt"],
+    # Pre-hash evita truncar senhas acima de 72 bytes; bcrypt legado continua valido.
+    schemes=["bcrypt_sha256", "bcrypt"],
     deprecated="auto",
 )
 

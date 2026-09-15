@@ -8,18 +8,12 @@ function resolveApiUrl() {
         return import.meta.env.VITE_API_URL
     }
 
-    if (
-        typeof window !== 'undefined' &&
-        window.location.hostname === 'vfitness-frontend.vercel.app'
-    ) {
-        return PRODUCTION_API_URL
-    }
-
-    return LOCAL_API_URL
+    return import.meta.env.PROD ? PRODUCTION_API_URL : LOCAL_API_URL
 }
 
 const client = axios.create({
     baseURL: resolveApiUrl(),
+    timeout: 30000,
     headers: {
         'Content-Type': 'application/json'
     }
@@ -41,6 +35,12 @@ client.interceptors.request.use(
 client.interceptors.response.use(
     (response) => response,
     (error) => {
+        // FastAPI devolve uma lista de objetos nos erros de validacao (422).
+        // Os formularios precisam de texto, ou o React falha ao renderizar.
+        const detail = error.response?.data?.detail
+        if (Array.isArray(detail)) {
+            error.response.data.detail = detail.map((item) => item.msg).join(' ')
+        }
         if (error.response?.status === 401) {
             localStorage.removeItem('token')
         }

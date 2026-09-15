@@ -1,0 +1,14 @@
+.git
+.venv
+**/.venv
+**/node_modules
+**/__pycache__
+.env*
+**/.env*
+**/tests
+**/*.db
+frontend/dist
+docs
+backend/configure_production.py
+backend/inspect_database.py
+backend/smoke_production.py

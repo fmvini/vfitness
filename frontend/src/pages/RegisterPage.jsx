@@ -66,6 +66,8 @@ export default function RegisterPage() {
                 <input
                     type="password"
                     placeholder="Senha"
+                    minLength={8}
+                    maxLength={128}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
@@ -74,6 +76,8 @@ export default function RegisterPage() {
                 <input
                     type="password"
                     placeholder="Confirmar senha"
+                    minLength={8}
+                    maxLength={128}
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
                     required

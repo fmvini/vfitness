@@ -18,14 +18,14 @@ acompanhamento de progresso.
 4. No diretorio `backend`, instale as dependencias e execute as migracoes:
 
 ```powershell
-.\.venv\Scripts\python.exe -m pip install -r requirements.txt
-.\.venv\Scripts\python.exe -m alembic upgrade head
+..\.venv\Scripts\python.exe -m pip install -r requirements.txt
+..\.venv\Scripts\python.exe -m alembic upgrade head
 ```
 
 5. Inicie a API no diretorio `backend`:
 
 ```powershell
-.\.venv\Scripts\python.exe -m uvicorn app.main:app --reload
+..\.venv\Scripts\python.exe -m uvicorn app.main:app --reload
 ```
 
 6. Inicie o frontend no diretorio `frontend`:
@@ -77,7 +77,7 @@ ENVIRONMENT=production
 DEBUG=false
 SECRET_KEY=gere-uma-chave-longa-e-aleatoria
 CORS_ORIGINS=["https://vfitness-frontend.vercel.app"]
-DATABASE_URL=postgresql://postgres:<senha>@db.qcjhtkiohtmmvpnjcvvw.supabase.co:5432/postgres?sslmode=require
+DATABASE_URL=postgresql://postgres.qcjhtkiohtmmvpnjcvvw:<senha-escapada>@aws-0-us-east-1.pooler.supabase.com:6543/postgres?sslmode=require
 ```
 
 A URL publica do projeto Supabase (`https://qcjhtkiohtmmvpnjcvvw.supabase.co`)
@@ -89,6 +89,48 @@ o banco online antes de usar o app em producao:
 
 ```powershell
 cd backend
-$env:DATABASE_URL="postgresql://postgres:<senha>@db.qcjhtkiohtmmvpnjcvvw.supabase.co:5432/postgres?sslmode=require"
+$env:DATABASE_URL="postgresql://postgres.qcjhtkiohtmmvpnjcvvw:<senha-escapada>@aws-0-us-east-1.pooler.supabase.com:5432/postgres?sslmode=require"
 ..\.venv\Scripts\python.exe -m alembic upgrade head
 ```
+
+O runtime usa o transaction pooler (6543); as migracoes usam o session pooler
+(5432). As tabelas possuem RLS sem politicas publicas: o acesso aos dados passa
+pela API FastAPI, que autentica o usuario e verifica a propriedade dos registros.
+
+### Operacao e verificacao
+
+O backend usa Python 3.12 na Vercel. Os diretorios raiz dos projetos sao
+`backend` e `frontend`, respectivamente. Execute o deploy a partir da raiz
+do repositorio, selecionando o projeto correto:
+
+```powershell
+# Backend
+$env:VERCEL_ORG_ID="team_AFHpEVNFJOSSWN7k9dBDeM6X"
+$env:VERCEL_PROJECT_ID="prj_6dMFxNXGkJHDTQbo6EsbDy3Ialgk"
+npx vercel@59.17.0 deploy --prod --yes --scope fmvini-projects
+
+# Frontend
+$env:VERCEL_PROJECT_ID="prj_4BP3xw56kKUMWbJ5Jfnq3kSuduu4"
+npx vercel@59.17.0 deploy --prod --yes --scope fmvini-projects
+```
+
+`GET /health` verifica o processo; `GET /health/ready` verifica o acesso as
+tabelas no Supabase. Os segredos de producao ficam na Vercel e no arquivo local
+ignorado `backend/.env.production`, nunca no codigo ou no bundle do frontend.
+
+`backend/configure_production.py` configura os dois projetos a partir desse
+arquivo (campo `SUPABASE_DB_PASSWORD`) e preserva a `SECRET_KEY` ja gerada nele.
+Com `--migrate`, aplica apenas as migracoes. Requer login previo na CLI da Vercel.
+O Client ID Google vem de `backend/.env`; a origem
+`https://vfitness-frontend.vercel.app` deve estar autorizada no Google Cloud.
+
+Testes locais, dentro do diretorio `backend`:
+
+```powershell
+..\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
+..\.venv\Scripts\python.exe -m unittest discover -s tests -v
+```
+
+`backend/smoke_production.py` testa a API publicada usando uma conta sintetica
+e remove somente os dados criados pelo teste. Requer as dependencias de
+desenvolvimento e `backend/.env.production` com a `DATABASE_URL` configurada.
