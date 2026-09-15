@@ -8,9 +8,11 @@ import {
 } from '../api/workoutApi'
 import WeekdaySelector from '../components/WeekdaySelector'
 import WorkoutCard from '../components/WorkoutCard'
-import { findTodayWorkout } from '../utils/weekdayDetector'
+import { useAuth } from '../context/AuthContext'
+import { resolveTodayWorkout } from '../utils/dailyWorkoutSelection'
 
 export default function DashboardPage() {
+    const { user } = useAuth()
     const [workouts, setWorkouts] = useState([])
     const [name, setName] = useState('')
     const [weekday, setWeekday] = useState('')
@@ -19,9 +21,9 @@ export default function DashboardPage() {
     const [saving, setSaving] = useState(false)
     const [error, setError] = useState('')
 
-    const todayWorkout = useMemo(
-        () => findTodayWorkout(workouts),
-        [workouts]
+    const { workout: todayWorkout, isOverride: isTodayOverride } = useMemo(
+        () => resolveTodayWorkout(workouts, user?.id),
+        [user?.id, workouts]
     )
 
     useEffect(() => {
@@ -162,6 +164,9 @@ export default function DashboardPage() {
                                     key={workout.id}
                                     workout={workout}
                                     isToday={workout.id === todayWorkout?.id}
+                                    isTodayOverride={
+                                        isTodayOverride && workout.id === todayWorkout?.id
+                                    }
                                     onEdit={startEditing}
                                     onDelete={handleDelete}
                                 />

@@ -27,7 +27,7 @@ export default function GoogleLoginButton({ onCredential, disabled }) {
                 {
                     theme: 'outline',
                     size: 'large',
-                    width: containerRef.current.offsetWidth,
+                    width: Math.min(containerRef.current.offsetWidth, 400),
                     text: 'signin_with'
                 }
             )

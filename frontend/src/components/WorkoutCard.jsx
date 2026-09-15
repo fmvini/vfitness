@@ -4,7 +4,8 @@ export default function WorkoutCard({
     workout,
     onDelete,
     onEdit,
-    isToday = false
+    isToday = false,
+    isTodayOverride = false
 }) {
     function handleDelete() {
         const confirmed = window.confirm(
@@ -18,7 +19,11 @@ export default function WorkoutCard({
 
     return (
         <div className={`workout-card${isToday ? ' workout-card-today' : ''}`}>
-            {isToday && <span className="today-label">Treino de hoje</span>}
+            {isToday && (
+                <span className="today-label">
+                    {isTodayOverride ? 'Escolhido para hoje' : 'Treino de hoje'}
+                </span>
+            )}
             <h3>{workout.name}</h3>
 
             <p>
@@ -26,7 +31,7 @@ export default function WorkoutCard({
             </p>
 
             <div className="workout-card-actions">
-                <Link to={`/workouts/${workout.id}/session`}>
+                <Link to={isToday ? '/today' : `/workouts/${workout.id}/session`}>
                     Abrir treino
                 </Link>
 

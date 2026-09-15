@@ -1,8 +1,26 @@
 import { useEffect, useMemo, useState } from 'react'
-import { Link, useParams } from 'react-router-dom'
+import {
+    Link,
+    useNavigate,
+    useParams,
+    useSearchParams
+} from 'react-router-dom'
 
-import { getWorkoutById, registerExerciseLog } from '../api/workoutApi'
-import { getWeekdayLabel } from '../utils/weekdayDetector'
+import {
+    getWorkoutById,
+    getWorkouts,
+    registerExerciseLog
+} from '../api/workoutApi'
+import { useAuth } from '../context/AuthContext'
+import {
+    clearDailyWorkoutSelection,
+    resolveTodayWorkout,
+    setDailyWorkoutSelection
+} from '../utils/dailyWorkoutSelection'
+import {
+    getCurrentWeekday,
+    getWeekdayLabel
+} from '../utils/weekdayDetector'
 
 function plannedRepetitions(value) {
     const repetitions = Number(String(value || '').match(/\d+/)?.[0])
@@ -63,7 +81,15 @@ function localDateKey() {
 
 export default function WorkoutSessionPage() {
     const { id } = useParams()
+    const navigate = useNavigate()
+    const [searchParams] = useSearchParams()
+    const { user } = useAuth()
+    const isTodaySession = searchParams.get('today') === '1'
     const [workout, setWorkout] = useState(null)
+    const [allWorkouts, setAllWorkouts] = useState([])
+    const [switchOpen, setSwitchOpen] = useState(false)
+    const [replacementId, setReplacementId] = useState('')
+    const [switchError, setSwitchError] = useState('')
     const [progress, setProgress] = useState({})
     const [finished, setFinished] = useState(false)
     const [loading, setLoading] = useState(true)
@@ -75,6 +101,9 @@ export default function WorkoutSessionPage() {
     useEffect(() => {
         async function loadWorkout() {
             try {
+                setLoading(true)
+                setError('')
+                setMessage('')
                 const data = await getWorkoutById(id)
                 const initial = Object.fromEntries(
                     data.exercises.map((exercise) => [
@@ -105,13 +134,39 @@ export default function WorkoutSessionPage() {
     }, [id, storageKey])
 
     useEffect(() => {
-        if (workout && Object.keys(progress).length) {
+        if (!isTodaySession) {
+            return
+        }
+
+        async function loadWorkoutOptions() {
+            try {
+                setSwitchError('')
+                const data = await getWorkouts()
+                setAllWorkouts(data)
+                const firstAlternative = data.find(
+                    (item) => String(item.id) !== String(id)
+                )
+                setReplacementId(String(firstAlternative?.id || ''))
+            } catch (err) {
+                setSwitchError('Não foi possível carregar os outros treinos.')
+            }
+        }
+
+        loadWorkoutOptions()
+    }, [id, isTodaySession])
+
+    useEffect(() => {
+        if (
+            workout &&
+            String(workout.id) === String(id) &&
+            Object.keys(progress).length
+        ) {
             localStorage.setItem(
                 storageKey,
                 JSON.stringify({ progress, finished })
             )
         }
-    }, [finished, progress, storageKey, workout])
+    }, [finished, id, progress, storageKey, workout])
 
     const completedCount = useMemo(
         () => Object.values(progress).filter((item) => item.complete).length,
@@ -190,6 +245,29 @@ export default function WorkoutSessionPage() {
         }
     }
 
+    function changeTodayWorkout(event) {
+        event.preventDefault()
+        const replacement = allWorkouts.find(
+            (item) => String(item.id) === replacementId
+        )
+
+        if (!replacement) {
+            return
+        }
+
+        const { presetWorkout } = resolveTodayWorkout(allWorkouts, user?.id)
+        if (replacement.id === presetWorkout?.id) {
+            clearDailyWorkoutSelection(user?.id)
+        } else {
+            setDailyWorkoutSelection(user?.id, replacement.id)
+        }
+
+        setSwitchOpen(false)
+        navigate(`/workouts/${replacement.id}/session?today=1`, {
+            replace: true
+        })
+    }
+
     if (loading) {
         return <main className="workout-session-page"><p>Preparando treino...</p></main>
     }
@@ -207,6 +285,14 @@ export default function WorkoutSessionPage() {
     const completionPercentage = totalActivities
         ? Math.round((completedCount / totalActivities) * 100)
         : 0
+    const otherWorkouts = allWorkouts.filter(
+        (item) => String(item.id) !== String(workout.id)
+    )
+    const {
+        presetWorkout,
+        isOverride: isTodayOverride
+    } = resolveTodayWorkout(allWorkouts, user?.id)
+    const currentWeekdayLabel = getWeekdayLabel(getCurrentWeekday())
 
     return (
         <main className="workout-session-page">
@@ -214,12 +300,67 @@ export default function WorkoutSessionPage() {
                 <div>
                     <span className="session-label">Treino em andamento</span>
                     <h1>{workout.name}</h1>
-                    <p>{getWeekdayLabel(workout.weekday)}</p>
+                    <p>
+                        {isTodaySession
+                            ? `${currentWeekdayLabel} · ${isTodayOverride
+                                ? 'escolhido apenas para hoje'
+                                : 'treino padrão do dia'}`
+                            : getWeekdayLabel(workout.weekday)}
+                    </p>
                 </div>
-                <Link className="button-secondary button" to={`/workouts/${workout.id}/edit`}>
-                    Configurar treino
-                </Link>
+                <div className="session-actions">
+                    {isTodaySession && (
+                        <button
+                            type="button"
+                            className="button-secondary"
+                            onClick={() => setSwitchOpen((current) => !current)}
+                        >
+                            Trocar treino
+                        </button>
+                    )}
+                    <Link className="button-secondary button" to={`/workouts/${workout.id}/edit`}>
+                        Configurar treino
+                    </Link>
+                </div>
             </div>
+
+            {isTodaySession && switchOpen && (
+                <section className="workout-switcher" aria-labelledby="workout-switcher-title">
+                    <div>
+                        <h2 id="workout-switcher-title">Trocar o treino de hoje</h2>
+                        <p>
+                            A troca vale somente para hoje.{' '}
+                            {presetWorkout
+                                ? `${presetWorkout.name} continuará como o treino padrão de ${currentWeekdayLabel}.`
+                                : 'Os dias padrão dos seus treinos não serão alterados.'}
+                        </p>
+                    </div>
+                    {switchError ? (
+                        <p className="form-error">{switchError}</p>
+                    ) : otherWorkouts.length ? (
+                        <form className="workout-switcher-form" onSubmit={changeTodayWorkout}>
+                            <label>
+                                Outro treino
+                                <select
+                                    value={replacementId}
+                                    onChange={(event) => setReplacementId(
+                                        event.target.value
+                                    )}
+                                >
+                                    {otherWorkouts.map((item) => (
+                                        <option key={item.id} value={item.id}>
+                                            {item.name} · {getWeekdayLabel(item.weekday)}
+                                        </option>
+                                    ))}
+                                </select>
+                            </label>
+                            <button type="submit">Usar hoje</button>
+                        </form>
+                    ) : (
+                        <p>Crie outro treino para poder fazer a troca.</p>
+                    )}
+                </section>
+            )}
 
             <div className="session-progress" aria-label={`${completionPercentage}% concluído`}>
                 <div>

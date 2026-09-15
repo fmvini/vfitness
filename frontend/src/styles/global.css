@@ -137,8 +137,7 @@ h3 {
 .navbar-logo img {
     width: 34px;
     height: 34px;
-    border-radius: var(--radius-sm);
-    object-fit: cover;
+    object-fit: contain;
 }
 
 .navbar-user {
@@ -163,7 +162,7 @@ h3 {
 
 .auth-page {
     display: grid;
-    width: min(100% - var(--space-8), 420px);
+    width: min(100% - var(--space-8), 400px);
     min-height: 100vh;
     align-content: center;
 }
@@ -185,8 +184,7 @@ h3 {
 .auth-brand img {
     width: 52px;
     height: 52px;
-    border-radius: var(--radius-md);
-    object-fit: cover;
+    object-fit: contain;
 }
 
 .auth-page > p {
@@ -705,6 +703,17 @@ a.workout-card:focus-visible {
 }
 
 .google-button {
+    width: 100%;
+    min-height: 44px;
+}
+
+.google-button > div,
+.google-button iframe {
+    width: 100% !important;
+}
+
+.auth-page form > button {
+    width: 100%;
     min-height: 44px;
 }
 
@@ -722,6 +731,39 @@ a.workout-card:focus-visible {
 
 .session-header p {
     margin: 0;
+}
+
+.session-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--space-3);
+}
+
+.workout-switcher {
+    display: grid;
+    gap: var(--space-4);
+    margin-bottom: var(--space-6);
+    border: 1px solid var(--color-primary-border);
+    border-radius: var(--radius-lg);
+    background: var(--color-primary-soft);
+    padding: var(--space-5);
+}
+
+.workout-switcher h2,
+.workout-switcher p {
+    margin-bottom: var(--space-2);
+}
+
+.workout-switcher-form,
+.today-workout-picker {
+    grid-template-columns: minmax(220px, 1fr) auto;
+    align-items: end;
+}
+
+.today-workout-picker {
+    max-width: 620px;
+    margin-top: var(--space-5);
 }
 
 .session-progress {
@@ -923,7 +965,9 @@ a.workout-card:focus-visible {
     }
 
     .workout-form,
-    .execution-form {
+    .execution-form,
+    .workout-switcher-form,
+    .today-workout-picker {
         grid-template-columns: 1fr;
     }
 
@@ -934,6 +978,14 @@ a.workout-card:focus-visible {
     .finish-bar {
         align-items: stretch;
         flex-direction: column;
+    }
+
+    .session-actions {
+        justify-content: stretch;
+    }
+
+    .session-actions > * {
+        flex: 1 1 180px;
     }
 
     .section-heading select {
