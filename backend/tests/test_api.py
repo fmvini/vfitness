@@ -50,22 +50,6 @@ class ApiTests(unittest.TestCase):
     def workout(self):
         return self.request("POST", "/workouts", 201, json={"name": "Treino A", "weekday": "segunda"})["id"]
 
-    def test_workout_multiple_weekdays(self):
-        workout = self.request("POST", "/workouts", 201, json={
-            "name": "Peito, tríceps e ombro", "weekdays": ["terca", "sexta"]
-        })
-        wid = workout["id"]
-        self.assertEqual(workout["weekdays"], ["terca", "sexta"])
-        self.assertEqual(workout["weekday"], "terca")
-        self.assertEqual(self.request("GET", f"/workouts/{wid}")["weekdays"], ["terca", "sexta"])
-        self.assertEqual(self.request("GET", "/workouts")[0]["weekdays"], ["terca", "sexta"])
-        updated = self.request("PATCH", f"/workouts/{wid}", json={"weekdays": ["segunda", "quinta"]})
-        self.assertEqual(updated["weekdays"], ["segunda", "quinta"])
-        self.request("PATCH", f"/workouts/{wid}", 422, json={"weekdays": ["segunda", "segunda"]})
-        self.assertEqual(self.request("PATCH", f"/workouts/{wid}", json={"weekdays": []})["weekday"], None)
-        self.assertEqual(self.request("PATCH", f"/workouts/{wid}", json={"weekday": "sabado"})["weekdays"], ["sabado"])
-        self.assertEqual(self.request("POST", "/workouts", 201, json={"name": "Legado", "weekday": "domingo"})["weekdays"], ["domingo"])
-
     def test_auth_and_isolation(self):
         self.request("GET", "/health/ready")
         self.request("GET", "/auth/me")

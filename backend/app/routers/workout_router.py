@@ -56,7 +56,7 @@ def list_all(
     Lista todos os treinos cadastrados pelo usuario autenticado.
 
     A deteccao do treino do dia (secao 2.4) e feita no frontend a partir
-    do campo weekdays de cada treino retornado aqui
+    do campo weekday de cada treino retornado aqui
     (ver frontend/src/utils/weekdayDetector.js).
     """
     return list_workouts(db, user_id=current_user.id)
@@ -82,7 +82,7 @@ def update(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user),
 ) -> WorkoutRead:
-    """Edita o nome e/ou os dias da semana de um treino existente (secao 2.2)."""
+    """Edita o nome e/ou o dia da semana de um treino existente (secao 2.2)."""
     return update_workout(
         db, workout_id=workout_id, user_id=current_user.id, workout_in=workout_in
     )

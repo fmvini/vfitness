@@ -10,7 +10,7 @@ import {
 } from '../api/workoutApi'
 import ExerciseForm from '../components/ExerciseForm'
 import ExerciseItem from '../components/ExerciseItem'
-import { getWorkoutWeekdayLabels } from '../utils/weekdayDetector'
+import { getWeekdayLabel } from '../utils/weekdayDetector'
 
 export default function WorkoutDetailPage() {
     const { id } = useParams()
@@ -139,7 +139,7 @@ export default function WorkoutDetailPage() {
             <div className="page-heading">
                 <div>
                     <h1>Configurar {workout.name}</h1>
-                    <p>{getWorkoutWeekdayLabels(workout)}</p>
+                    <p>{getWeekdayLabel(workout.weekday)}</p>
                 </div>
                 <Link className="button" to={`/workouts/${workout.id}/session`}>
                     Iniciar treino

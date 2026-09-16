@@ -341,25 +341,6 @@ button:active,
     align-items: end;
 }
 
-.workout-days {
-    display: grid;
-    gap: var(--space-2);
-}
-
-.workout-day-row {
-    display: flex;
-    gap: var(--space-2);
-}
-
-.workout-day-row select {
-    flex: 1;
-    min-width: 0;
-}
-
-.add-day-button {
-    justify-self: start;
-}
-
 .form-actions {
     display: flex;
     flex-wrap: wrap;
