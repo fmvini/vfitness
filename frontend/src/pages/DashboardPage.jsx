@@ -10,12 +10,13 @@ import WeekdaySelector from '../components/WeekdaySelector'
 import WorkoutCard from '../components/WorkoutCard'
 import { useAuth } from '../context/AuthContext'
 import { resolveTodayWorkout } from '../utils/dailyWorkoutSelection'
+import { WEEKDAYS, getWorkoutWeekdays } from '../utils/weekdayDetector'
 
 export default function DashboardPage() {
     const { user } = useAuth()
     const [workouts, setWorkouts] = useState([])
     const [name, setName] = useState('')
-    const [weekday, setWeekday] = useState('')
+    const [weekdays, setWeekdays] = useState([''])
     const [editingId, setEditingId] = useState(null)
     const [loading, setLoading] = useState(true)
     const [saving, setSaving] = useState(false)
@@ -46,13 +47,14 @@ export default function DashboardPage() {
 
     function resetForm() {
         setName('')
-        setWeekday('')
+        setWeekdays([''])
         setEditingId(null)
     }
 
     function startEditing(workout) {
         setName(workout.name)
-        setWeekday(workout.weekday || '')
+        const days = getWorkoutWeekdays(workout)
+        setWeekdays(days.length ? days : [''])
         setEditingId(workout.id)
         window.scrollTo({ top: 0, behavior: 'smooth' })
     }
@@ -62,7 +64,7 @@ export default function DashboardPage() {
         try {
             setSaving(true)
             setError('')
-            const payload = { name, weekday: weekday || null }
+            const payload = { name, weekdays: weekdays.filter(Boolean) }
             if (editingId) {
                 await updateWorkout(editingId, payload)
             } else {
@@ -118,10 +120,40 @@ export default function DashboardPage() {
                             required
                         />
                     </label>
-                    <label>
-                        Dia da semana
-                        <WeekdaySelector value={weekday} onChange={setWeekday} />
-                    </label>
+                    <div className="workout-days">
+                        <span>Dias da semana</span>
+                        {weekdays.map((day, index) => (
+                            <div className="workout-day-row" key={index}>
+                                <WeekdaySelector
+                                    value={day}
+                                    label={`Dia da semana ${index + 1}`}
+                                    excluded={weekdays.filter((_, position) => position !== index)}
+                                    onChange={(value) => setWeekdays((current) =>
+                                        current.map((item, position) => position === index ? value : item)
+                                    )}
+                                />
+                                {weekdays.length > 1 && (
+                                    <button
+                                        type="button"
+                                        className="button-secondary"
+                                        aria-label={`Remover dia ${index + 1}`}
+                                        onClick={() => setWeekdays((current) => current.filter((_, position) => position !== index))}
+                                    >
+                                        Remover
+                                    </button>
+                                )}
+                            </div>
+                        ))}
+                        {weekdays.length < WEEKDAYS.length && (
+                            <button
+                                type="button"
+                                className="button-secondary add-day-button"
+                                onClick={() => setWeekdays((current) => [...current, ''])}
+                            >
+                                Adicionar dia
+                            </button>
+                        )}
+                    </div>
                     <div className="form-actions">
                         <button type="submit" disabled={saving}>
                             {saving ? 'Salvando...' : 'Salvar treino'}

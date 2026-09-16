@@ -49,7 +49,11 @@ def _owned_exercise(db: Session, exercise_id: int, user_id: int) -> Exercise:
 def create_workout(
     db: Session, user_id: int, workout_in: WorkoutCreate
 ) -> Workout:
-    workout = Workout(user_id=user_id, **workout_in.model_dump())
+    data = workout_in.model_dump()
+    days = data.pop("weekdays")
+    data["weekdays"] = days if days is not None else ([data["weekday"]] if data["weekday"] else [])
+    data["weekday"] = data["weekdays"][0] if data["weekdays"] else None
+    workout = Workout(user_id=user_id, **data)
     db.add(workout)
     db.commit()
     db.refresh(workout)
@@ -87,7 +91,14 @@ def update_workout(
     workout_in: WorkoutUpdate,
 ) -> Workout:
     workout = _owned_workout(db, workout_id, user_id)
-    for field, value in workout_in.model_dump(exclude_unset=True).items():
+    data = workout_in.model_dump(exclude_unset=True)
+    if "weekdays" in data:
+        days = data.pop("weekdays") or []
+        data["weekdays"] = days
+        data["weekday"] = days[0] if days else None
+    elif "weekday" in data:
+        data["weekdays"] = [data["weekday"]] if data["weekday"] else []
+    for field, value in data.items():
         setattr(workout, field, value)
     db.commit()
     db.refresh(workout)

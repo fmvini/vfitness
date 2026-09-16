@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import { getWorkoutWeekdayLabels } from '../utils/weekdayDetector'
 
 export default function WorkoutCard({
     workout,
@@ -27,7 +28,7 @@ export default function WorkoutCard({
             <h3>{workout.name}</h3>
 
             <p>
-                Dia: {workout.weekday || 'Não definido'}
+                Dias: {getWorkoutWeekdayLabels(workout)}
             </p>
 
             <div className="workout-card-actions">

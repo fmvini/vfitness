@@ -4,8 +4,8 @@ models/workout.py
 Modelo ORM da entidade Workout (treino/preset).
 
 Um Workout pertence a um unico User e pode, opcionalmente, estar associado
-a um dia da semana (campo weekday). Quando associado, o sistema abre esse
-treino automaticamente ao usuario acessar a pagina no dia correspondente
+a varios dias da semana (campo weekdays). Quando associado, o sistema abre esse
+treino automaticamente ao usuario acessar a pagina em um dia correspondente
 (secao 2.4, "Deteccao de Treino do Dia").
 """
 
@@ -15,7 +15,7 @@ import enum
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 
-from sqlalchemy import DateTime
+from sqlalchemy import DateTime, JSON
 from sqlalchemy import Enum as SAEnum
 from sqlalchemy import ForeignKey, String
 from sqlalchemy.orm import Mapped, mapped_column, relationship
@@ -61,12 +61,13 @@ class Workout(Base):
 
     name: Mapped[str] = mapped_column(String(120), nullable=False)
 
-    # Campo opcional: um treino pode nao ter dia fixo associado
+    # Mantido para clientes antigos; reflete o primeiro dia da lista.
     weekday: Mapped[Weekday | None] = mapped_column(
         SAEnum(Weekday, name="weekday_enum", native_enum=False),
         nullable=True,
         index=True,
     )
+    weekdays: Mapped[list[str]] = mapped_column(JSON, nullable=False, default=list)
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),

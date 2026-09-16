@@ -31,10 +31,13 @@ const weekdays = [
 
 export default function WeekdaySelector({
     value,
-    onChange
+    onChange,
+    excluded = [],
+    label = 'Dia da semana'
 }) {
     return (
         <select
+            aria-label={label}
             value={value || ''}
             onChange={(e) =>
                 onChange(e.target.value)
@@ -48,6 +51,7 @@ export default function WeekdaySelector({
                 <option
                     key={day.value}
                     value={day.value}
+                    disabled={excluded.includes(day.value)}
                 >
                     {day.label}
                 </option>
