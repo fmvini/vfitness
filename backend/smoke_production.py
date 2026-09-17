@@ -40,7 +40,7 @@ def request(method, path, body=None, expected=200, authenticated=True):
 
 try:
     request("GET", "/health/ready")
-    token = request("POST", "/auth/register", {"name": "Deployment Check", "email": email, "password": password}, 201)["access_token"]
+    token = request("POST", "/auth/register", {"name": "Deployment Check", "email": email, "password": password, "accept_terms": True}, 201)["access_token"]
     request("GET", "/auth/me")
     token = request("POST", "/auth/login", {"email": email, "password": password})["access_token"]
     request("POST", "/auth/login", {"email": email, "password": password + "wrong"}, 401, authenticated=False)
@@ -64,7 +64,7 @@ try:
     assert [item["id"] for item in reordered] == [cid, eid]
     assert [item["id"] for item in request("GET", f"/workouts/{wid}")["exercises"]] == [cid, eid]
     owner_token = token
-    token = request("POST", "/auth/register", {"name": "Deployment Check", "email": other_email, "password": password}, 201, authenticated=False)["access_token"]
+    token = request("POST", "/auth/register", {"name": "Deployment Check", "email": other_email, "password": password, "accept_terms": True}, 201, authenticated=False)["access_token"]
     assert request("GET", "/workouts") == []
     request("GET", f"/workouts/{wid}", expected=404)
     request("PATCH", f"/exercises/{eid}", {"name": "Forbidden"}, 404)

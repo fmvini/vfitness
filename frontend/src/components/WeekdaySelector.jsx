@@ -1,57 +1,26 @@
-const weekdays = [
-    {
-        value: 'segunda',
-        label: 'Segunda-feira'
-    },
-    {
-        value: 'terca',
-        label: 'Terça-feira'
-    },
-    {
-        value: 'quarta',
-        label: 'Quarta-feira'
-    },
-    {
-        value: 'quinta',
-        label: 'Quinta-feira'
-    },
-    {
-        value: 'sexta',
-        label: 'Sexta-feira'
-    },
-    {
-        value: 'sabado',
-        label: 'Sábado'
-    },
-    {
-        value: 'domingo',
-        label: 'Domingo'
+import { WEEKDAYS } from '../utils/weekdayDetector'
+
+const weekdays = [...WEEKDAYS.slice(1), WEEKDAYS[0]]
+
+export default function WeekdaySelector({ value = [], onChange }) {
+    function toggle(day) {
+        onChange(value.includes(day)
+            ? value.filter((selected) => selected !== day)
+            : weekdays.map(({ value: candidate }) => candidate)
+                .filter((candidate) => candidate === day || value.includes(candidate)))
     }
-]
 
-export default function WeekdaySelector({
-    value,
-    onChange
-}) {
     return (
-        <select
-            value={value || ''}
-            onChange={(e) =>
-                onChange(e.target.value)
-            }
-        >
-            <option value="">
-                Sem dia definido
-            </option>
-
-            {weekdays.map((day) => (
-                <option
-                    key={day.value}
-                    value={day.value}
-                >
-                    {day.label}
-                </option>
-            ))}
-        </select>
+        <fieldset className="weekday-selector">
+            <legend>Dias da semana <span>(opcional)</span></legend>
+            <div className="weekday-options">
+                {weekdays.map((day) => (
+                    <label key={day.value} className="weekday-option">
+                        <input type="checkbox" checked={value.includes(day.value)} onChange={() => toggle(day.value)} />
+                        <span>{day.label}</span>
+                    </label>
+                ))}
+            </div>
+        </fieldset>
     )
 }

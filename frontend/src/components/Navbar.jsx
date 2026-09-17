@@ -1,58 +1,29 @@
-import { Link } from 'react-router-dom'
-
+import { Link, NavLink } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-
 import ThemeToggle from './ThemeToggle'
 
 export default function Navbar() {
-    const {
-        user,
-        isAuthenticated,
-        logout
-    } = useAuth()
-
-    if (!isAuthenticated) {
-        return null
-    }
+    const { user, isAuthenticated, logout } = useAuth()
+    if (!isAuthenticated) return null
 
     return (
-        <nav className="navbar">
-            <div className="navbar-left">
-                <Link
-                    to="/"
-                    className="navbar-logo"
-                >
-                    <img src="/vfitness-mark.png" alt="" />
+        <header className="navbar">
+            <div className="navbar-inner">
+                <Link to="/" className="navbar-logo" aria-label="VFitness, início">
+                    <img src="/vfitness-mark.svg" alt="" />
                     <span>VFitness</span>
                 </Link>
-
-                <Link to="/">
-                    Dashboard
-                </Link>
-
-                <Link to="/today">
-                    Treino do dia
-                </Link>
-
-                <Link to="/stats">
-                    Estatísticas
-                </Link>
+                <nav className="navbar-links" aria-label="Navegação principal">
+                    <NavLink end to="/" className={({ isActive }) => isActive ? 'active' : ''}>Meus treinos</NavLink>
+                    <NavLink to="/today" className={({ isActive }) => isActive ? 'active' : ''}>Treino do dia</NavLink>
+                    <NavLink to="/stats" className={({ isActive }) => isActive ? 'active' : ''}>Estatísticas</NavLink>
+                </nav>
+                <div className="navbar-right">
+                    <span className="navbar-user" title={user?.name}>{user?.name}</span>
+                    <button type="button" className="logout-button" onClick={logout}>Sair</button>
+                    <ThemeToggle />
+                </div>
             </div>
-
-            <div className="navbar-right">
-                <span className="navbar-user">
-                    {user?.name}
-                </span>
-
-                <ThemeToggle />
-
-                <button
-                    type="button"
-                    onClick={logout}
-                >
-                    Sair
-                </button>
-            </div>
-        </nav>
+        </header>
     )
 }

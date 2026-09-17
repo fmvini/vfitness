@@ -1,41 +1,24 @@
-import client from './client'
+import { getCached } from './client'
 
 export async function getDashboardStats() {
-    const response = await client.get('/stats/dashboard')
-    return response.data
+    return getCached('/stats/dashboard')
 }
 
 export async function getWorkoutFrequency(period = 'week') {
-    const response = await client.get(
-        `/stats/frequency?period=${period}`
-    )
-
-    return response.data
+    return getCached(`/stats/frequency?period=${period}`)
 }
 
 export async function getTotalWeight(period = 'week') {
-    const response = await client.get(
-        `/stats/total-weight?period=${period}`
-    )
-
-    return response.data
+    return getCached(`/stats/total-weight?period=${period}`)
 }
 
 export async function getExerciseProgress(
     exerciseId,
     period = 'month'
 ) {
-    const response = await client.get(
-        `/stats/exercises/${exerciseId}/progress?period=${period}`
-    )
-
-    return response.data
+    return getCached(`/stats/exercises/${exerciseId}/progress?period=${period}`)
 }
 
 export async function getTopProgressExercises() {
-    const response = await client.get(
-        '/stats/top-progress'
-    )
-
-    return response.data
+    return getCached('/stats/top-progress')
 }

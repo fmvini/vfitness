@@ -17,10 +17,13 @@ from app.auth.jwt_handler import create_access_token
 from app.auth.password_hash import hash_password, verify_password
 from app.database import Base, get_db
 from app.main import app
+from app.rate_limit import limiter
 
 
 class ApiTests(unittest.TestCase):
     def setUp(self):
+        with limiter.lock:
+            limiter.hits.clear()
         self.engine = create_engine("sqlite://", connect_args={"check_same_thread": False}, poolclass=StaticPool)
         Base.metadata.create_all(self.engine)
 
@@ -38,7 +41,7 @@ class ApiTests(unittest.TestCase):
         self.engine.dispose()
 
     def register(self, email):
-        response = self.client.post("/auth/register", json={"name": "Test User", "email": email, "password": "Test-password-123"})
+        response = self.client.post("/auth/register", json={"name": "Test User", "email": email, "password": "Test-password-123", "accept_terms": True})
         self.assertEqual(response.status_code, 201, response.text)
         return {"Authorization": "Bearer " + response.json()["access_token"]}
 
@@ -49,6 +52,21 @@ class ApiTests(unittest.TestCase):
 
     def workout(self):
         return self.request("POST", "/workouts", 201, json={"name": "Treino A", "weekday": "segunda"})["id"]
+
+    def test_multiple_weekdays_and_terms(self):
+        self.request("POST", "/auth/register", 422, json={"name": "No Terms", "email": "no@example.com", "password": "Test-password-123", "accept_terms": False})
+        created = self.request("POST", "/workouts", 201, json={"name": "Costas", "weekdays": ["segunda", "quarta"]})
+        self.assertEqual(created["weekdays"], ["segunda", "quarta"])
+        self.assertEqual(created["weekday"], "segunda")
+        updated = self.request("PATCH", f"/workouts/{created['id']}", json={"weekdays": ["terca", "sexta"]})
+        self.assertEqual(updated["weekdays"], ["terca", "sexta"])
+        self.request("PATCH", f"/workouts/{created['id']}", 422, json={"weekdays": ["terca", "terca"]})
+
+    def test_rate_limit_window(self):
+        key = ("isolated-test-client", "auth")
+        self.assertEqual(limiter.check(key, 2), 0)
+        self.assertEqual(limiter.check(key, 2), 0)
+        self.assertGreater(limiter.check(key, 2), 0)
 
     def test_auth_and_isolation(self):
         self.request("GET", "/health/ready")

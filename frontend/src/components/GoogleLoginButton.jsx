@@ -1,14 +1,16 @@
 import { useEffect, useRef, useState } from 'react'
+import { useCookieConsent } from '../context/CookieConsentContext'
 
 const GOOGLE_SCRIPT_URL = 'https://accounts.google.com/gsi/client'
 
 export default function GoogleLoginButton({ onCredential, disabled }) {
     const containerRef = useRef(null)
     const [error, setError] = useState('')
+    const { choice, openPreferences } = useCookieConsent()
     const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
 
     useEffect(() => {
-        if (!clientId || disabled) {
+        if (!clientId || disabled || choice !== 'accepted') {
             return undefined
         }
 
@@ -56,7 +58,7 @@ export default function GoogleLoginButton({ onCredential, disabled }) {
         })
 
         return () => script.removeEventListener('load', renderButton)
-    }, [clientId, disabled, onCredential])
+    }, [clientId, disabled, onCredential, choice])
 
     if (!clientId) {
         return null
@@ -65,7 +67,9 @@ export default function GoogleLoginButton({ onCredential, disabled }) {
     return (
         <div className="google-login">
             <div className="auth-divider"><span>ou</span></div>
-            <div ref={containerRef} className="google-button" />
+            {choice === 'accepted' ? <div ref={containerRef} className="google-button" /> : (
+                <p className="google-consent-note">Para usar o login com Google, <button type="button" className="text-button" onClick={openPreferences}>aceite os cookies opcionais</button>.</p>
+            )}
             {error && <p className="form-error">{error}</p>}
         </div>
     )

@@ -45,23 +45,21 @@ export default function ExerciseItem({
             <div className="exercise-actions">
                 <button
                     type="button"
-                    className="icon-button"
                     title="Mover para cima"
                     aria-label="Mover para cima"
                     disabled={isFirst}
                     onClick={onMoveUp}
                 >
-                    ↑
+                    Subir
                 </button>
                 <button
                     type="button"
-                    className="icon-button"
                     title="Mover para baixo"
                     aria-label="Mover para baixo"
                     disabled={isLast}
                     onClick={onMoveDown}
                 >
-                    ↓
+                    Descer
                 </button>
                 <button type="button" onClick={() => onEdit(exercise)}>
                     Editar

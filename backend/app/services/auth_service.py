@@ -21,6 +21,7 @@ Ao criar app/auth/, seguir esse contrato ou ajustar as chamadas abaixo.
 
 from __future__ import annotations
 
+from datetime import datetime, timezone
 from typing import TYPE_CHECKING
 
 from fastapi import Depends, HTTPException, status
@@ -57,6 +58,8 @@ def register_user(db: Session, user_in: UserCreate) -> Token:
     imediatamente apos o cadastro, para que o usuario nao precise logar em
     seguida.
     """
+    if not user_in.accept_terms:
+        raise HTTPException(status_code=422, detail="Aceite os Termos de Uso para criar sua conta.")
     if get_user_by_email(db, user_in.email) is not None:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
@@ -67,6 +70,7 @@ def register_user(db: Session, user_in: UserCreate) -> Token:
         name=user_in.name,
         email=user_in.email,
         password_hash=hash_password(user_in.password),
+        accepted_terms_at=datetime.now(timezone.utc),
     )
     db.add(user)
     db.commit()
@@ -93,7 +97,7 @@ def authenticate_user(db: Session, credentials: UserLogin) -> Token:
     return _build_token(user)
 
 
-def authenticate_or_create_google_user(db: Session, id_token: str) -> Token:
+def authenticate_or_create_google_user(db: Session, id_token: str, accept_terms: bool = False) -> Token:
     """
     Autentica um usuario via Google OAuth, criando a conta automaticamente
     no primeiro acesso ou associando a uma conta tradicional existente com
@@ -108,6 +112,8 @@ def authenticate_or_create_google_user(db: Session, id_token: str) -> Token:
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token do Google invalido ou expirado.",
         )
+    if not accept_terms:
+        raise HTTPException(status_code=422, detail="Aceite os Termos de Uso para entrar com o Google.")
 
     stmt = select(User).where(User.google_id == google_user.sub)
     user = db.execute(stmt).scalar_one_or_none()
@@ -124,12 +130,19 @@ def authenticate_or_create_google_user(db: Session, id_token: str) -> Token:
                 name=google_user.name,
                 email=google_user.email,
                 google_id=google_user.sub,
+                accepted_terms_at=datetime.now(timezone.utc),
             )
             db.add(user)
+
+        if user.accepted_terms_at is None:
+            user.accepted_terms_at = datetime.now(timezone.utc)
 
         db.commit()
         db.refresh(user)
 
+    if user.accepted_terms_at is None:
+        user.accepted_terms_at = datetime.now(timezone.utc)
+        db.commit()
     return _build_token(user)
 
 

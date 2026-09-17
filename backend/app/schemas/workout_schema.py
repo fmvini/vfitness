@@ -22,6 +22,14 @@ class WorkoutBase(BaseModel):
     name: str = Field(..., min_length=1, max_length=120)
     # Campo opcional: um treino pode nao ter dia fixo associado (secao 2.2)
     weekday: Weekday | None = None
+    weekdays: list[Weekday] = Field(default_factory=list, max_length=7)
+
+    @field_validator("weekdays")
+    @classmethod
+    def unique_weekdays(cls, value: list[Weekday]) -> list[Weekday]:
+        if len(value) != len(set(value)):
+            raise ValueError("Selecione cada dia da semana apenas uma vez.")
+        return value
 
 
 class WorkoutCreate(WorkoutBase):
@@ -40,6 +48,14 @@ class WorkoutUpdate(BaseModel):
 
     name: str | None = Field(default=None, min_length=1, max_length=120)
     weekday: Weekday | None = None
+    weekdays: list[Weekday] | None = Field(default=None, max_length=7)
+
+    @field_validator("weekdays")
+    @classmethod
+    def unique_weekdays(cls, value: list[Weekday] | None) -> list[Weekday] | None:
+        if value is not None and len(value) != len(set(value)):
+            raise ValueError("Selecione cada dia da semana apenas uma vez.")
+        return value
 
     @field_validator("name")
     @classmethod

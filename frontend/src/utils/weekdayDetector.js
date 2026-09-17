@@ -41,6 +41,17 @@ export function getWeekdayLabel(weekday) {
     return day?.label || 'Não definido'
 }
 
+export function getWeekdays(workout) {
+    return Array.isArray(workout?.weekdays)
+        ? workout.weekdays
+        : workout?.weekday ? [workout.weekday] : []
+}
+
+export function getWeekdaysLabel(workout) {
+    const days = getWeekdays(workout)
+    return days.length ? days.map(getWeekdayLabel).join(' · ') : 'Sem dia definido'
+}
+
 export function findTodayWorkout(workouts, date = new Date()) {
     if (!Array.isArray(workouts)) {
         return null
@@ -49,7 +60,7 @@ export function findTodayWorkout(workouts, date = new Date()) {
     const currentWeekday = getCurrentWeekday(date)
 
     return workouts.find(
-        (workout) => workout.weekday === currentWeekday
+        (workout) => getWeekdays(workout).includes(currentWeekday)
     ) || null
 }
 

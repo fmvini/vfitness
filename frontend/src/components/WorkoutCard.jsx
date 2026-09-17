@@ -1,61 +1,33 @@
 import { Link } from 'react-router-dom'
+import { getWeekdaysLabel } from '../utils/weekdayDetector'
 
 export default function WorkoutCard({
-    workout,
-    onDelete,
-    onEdit,
-    isToday = false,
-    isTodayOverride = false
+    workout, onDelete, onEdit, isToday = false, isTodayOverride = false
 }) {
     function handleDelete() {
-        const confirmed = window.confirm(
-            'Deseja remover este treino?'
-        )
-
-        if (confirmed) {
+        if (window.confirm(`Remover o treino “${workout.name}”? Esta ação não pode ser desfeita.`)) {
             onDelete(workout.id)
         }
     }
 
     return (
-        <div className={`workout-card${isToday ? ' workout-card-today' : ''}`}>
-            {isToday && (
-                <span className="today-label">
-                    {isTodayOverride ? 'Escolhido para hoje' : 'Treino de hoje'}
-                </span>
-            )}
-            <h3>{workout.name}</h3>
-
-            <p>
-                Dia: {workout.weekday || 'Não definido'}
-            </p>
-
-            <div className="workout-card-actions">
-                <Link to={isToday ? '/today' : `/workouts/${workout.id}/session`}>
-                    Abrir treino
-                </Link>
-
-                <Link
-                    to={`/workouts/${workout.id}/edit`}
-                    className="button-secondary"
-                >
-                    Exercícios
-                </Link>
-
-                <button
-                    type="button"
-                    onClick={() => onEdit(workout)}
-                >
-                    Editar
-                </button>
-
-                <button
-                    type="button"
-                    onClick={handleDelete}
-                >
-                    Remover
-                </button>
+        <article className={`workout-card${isToday ? ' workout-card-today' : ''}`}>
+            <div className="workout-card-day">
+                <span>{getWeekdaysLabel(workout)}</span>
+                {isToday && <strong>{isTodayOverride ? 'Escolhido para hoje' : 'Hoje'}</strong>}
             </div>
-        </div>
+            <div className="workout-card-main">
+                <h3>{workout.name}</h3>
+                {isToday && <p>Pronto para começar.</p>}
+            </div>
+            <div className="workout-card-actions">
+                <Link className="button button-small" to={isToday ? '/today' : `/workouts/${workout.id}/session`}>
+                    Iniciar
+                </Link>
+                <Link className="text-link" to={`/workouts/${workout.id}/edit`}>Atividades</Link>
+                <button type="button" className="text-button" onClick={() => onEdit(workout)}>Editar</button>
+                <button type="button" className="text-button danger-text" onClick={handleDelete}>Remover</button>
+            </div>
+        </article>
     )
 }

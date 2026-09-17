@@ -56,6 +56,9 @@ Desktop.ini
 *.swp
 *.swo
 
+#Impeccable files
+.impeccable/
+
 # Build and cache folders
 dist/
 build/

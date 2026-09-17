@@ -22,22 +22,18 @@ acompanhamento de progresso.
 ..\.venv\Scripts\python.exe -m alembic upgrade head
 ```
 
-5. Inicie a API no diretorio `backend`:
-
-```powershell
-..\.venv\Scripts\python.exe -m uvicorn app.main:app --reload
-```
-
-6. Inicie o frontend no diretorio `frontend`:
+5. Inicie API e frontend com um unico comando no diretorio `frontend`:
 
 ```powershell
 npm install
 npm run dev
 ```
 
-O frontend fica em `http://localhost:5173`, a API em
-`http://localhost:8000` e a documentacao interativa em
-`http://localhost:8000/docs`.
+O comando verifica se a API e o banco estao prontos, inicia os servicos que
+faltarem e conecta o Vite a `http://127.0.0.1:8000`. O frontend fica em
+`http://127.0.0.1:5173` e a documentacao da API em
+`http://127.0.0.1:8000/docs`. Mantenha o terminal aberto durante o uso.
+Para iniciar apenas o frontend, use `npm run dev:frontend`.
 
 ## Login com Google
 
@@ -130,6 +126,15 @@ Testes locais, dentro do diretorio `backend`:
 ..\.venv\Scripts\python.exe -m pip install -r requirements-dev.txt
 ..\.venv\Scripts\python.exe -m unittest discover -s tests -v
 ```
+
+As migracoes mais recentes permitem associar varios dias a um treino e registram
+a data de aceite dos Termos de Uso. Execute `alembic upgrade head` antes de
+subir esta versao da API. O frontend carrega paginas sob demanda e guarda
+respostas GET por ate 30 segundos apenas em memoria, invalidando o cache apos
+alteracoes ou troca de sessao. A API limita solicitacoes por IP em cada processo
+(10/minuto nas rotas de autenticacao e 120/minuto nas demais rotas). Em um
+deploy com varias instancias, configure um limitador compartilhado para aplicar
+um limite global.
 
 `backend/smoke_production.py` testa a API publicada usando uma conta sintetica
 e remove somente os dados criados pelo teste. Requer as dependencias de

@@ -40,7 +40,7 @@ export default function ProgressChart({
                     <Line
                         type="monotone"
                         dataKey="load_kg"
-                        stroke="#2563eb"
+                        stroke="var(--color-primary)"
                         strokeWidth={3}
                     />
                 </LineChart>

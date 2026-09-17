@@ -39,6 +39,7 @@ class GoogleLoginRequest(BaseModel):
     """
 
     id_token: str
+    accept_terms: bool = False
 
 
 @router.post("/register", response_model=Token, status_code=status.HTTP_201_CREATED)
@@ -74,7 +75,7 @@ def login_with_google(payload: GoogleLoginRequest, db: Session = Depends(get_db)
     O frontend envia o credential emitido pelo Google Identity Services e
     o backend valida audiencia, assinatura e validade antes de autenticar.
     """
-    return authenticate_or_create_google_user(db, payload.id_token)
+    return authenticate_or_create_google_user(db, payload.id_token, payload.accept_terms)
 
 
 @router.post("/logout", status_code=status.HTTP_204_NO_CONTENT)

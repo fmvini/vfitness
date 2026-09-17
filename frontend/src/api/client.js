@@ -19,6 +19,32 @@ const client = axios.create({
     }
 })
 
+const responseCache = new Map()
+let cacheVersion = 0
+const CACHE_TTL_MS = 30_000
+
+export function clearApiCache() {
+    responseCache.clear()
+    cacheVersion += 1
+}
+
+export async function getCached(path) {
+    const key = `${localStorage.getItem('token') || ''}:${path}`
+    const cached = responseCache.get(key)
+    if (cached && cached.expires > Date.now()) return cached.promise
+
+    const version = cacheVersion
+    const promise = client.get(path).then(({ data }) => data).catch((error) => {
+        if (responseCache.get(key)?.promise === promise) responseCache.delete(key)
+        throw error
+    })
+    responseCache.set(key, { promise, expires: Date.now() + CACHE_TTL_MS })
+    promise.then(() => {
+        if (version !== cacheVersion) responseCache.delete(key)
+    }).catch(() => {})
+    return promise
+}
+
 client.interceptors.request.use(
     (config) => {
         const token = localStorage.getItem('token')
@@ -33,7 +59,10 @@ client.interceptors.request.use(
 )
 
 client.interceptors.response.use(
-    (response) => response,
+    (response) => {
+        if (response.config.method !== 'get') clearApiCache()
+        return response
+    },
     (error) => {
         // FastAPI devolve uma lista de objetos nos erros de validacao (422).
         // Os formularios precisam de texto, ou o React falha ao renderizar.
@@ -42,6 +71,7 @@ client.interceptors.response.use(
             error.response.data.detail = detail.map((item) => item.msg).join(' ')
         }
         if (error.response?.status === 401) {
+            clearApiCache()
             localStorage.removeItem('token')
         }
 

@@ -18,6 +18,7 @@ const AuthContext = createContext()
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null)
     const [loading, setLoading] = useState(true)
+    const [connectionError, setConnectionError] = useState(false)
 
     const isAuthenticated = !!user
 
@@ -26,6 +27,8 @@ export function AuthProvider({ children }) {
     }, [])
 
     async function initializeAuth() {
+        setLoading(true)
+        setConnectionError(false)
         const token = localStorage.getItem('token')
 
         if (!token) {
@@ -37,8 +40,12 @@ export function AuthProvider({ children }) {
             const userData = await getCurrentUser()
             setUser(userData)
         } catch (error) {
-            localStorage.removeItem('token')
-            setUser(null)
+            if (error.response?.status === 401 || error.response?.status === 403) {
+                localStorage.removeItem('token')
+                setUser(null)
+            } else {
+                setConnectionError(true)
+            }
         } finally {
             setLoading(false)
         }
@@ -53,37 +60,44 @@ export function AuthProvider({ children }) {
         const userData = await getCurrentUser()
 
         setUser(userData)
+        setConnectionError(false)
 
         return response
     }
 
-    async function register(name, email, password) {
+    async function register(name, email, password, acceptTerms) {
         const response = await registerRequest({
             name,
             email,
-            password
+            password,
+            accept_terms: acceptTerms
         })
 
         const userData = await getCurrentUser()
         setUser(userData)
+        setConnectionError(false)
         return response
     }
 
-    async function loginWithGoogle(credential) {
-        const response = await googleLoginRequest(credential)
+    async function loginWithGoogle(credential, acceptTerms) {
+        const response = await googleLoginRequest(credential, acceptTerms)
         const userData = await getCurrentUser()
         setUser(userData)
+        setConnectionError(false)
         return response
     }
 
     function logout() {
         logoutRequest()
         setUser(null)
+        setConnectionError(false)
     }
 
     const value = {
         user,
         loading,
+        connectionError,
+        retryConnection: initializeAuth,
         isAuthenticated,
         login,
         register,

@@ -19,7 +19,8 @@ import {
 } from '../utils/dailyWorkoutSelection'
 import {
     getCurrentWeekday,
-    getWeekdayLabel
+    getWeekdayLabel,
+    getWeekdaysLabel
 } from '../utils/weekdayDetector'
 
 function plannedRepetitions(value) {
@@ -305,7 +306,7 @@ export default function WorkoutSessionPage() {
                             ? `${currentWeekdayLabel} · ${isTodayOverride
                                 ? 'escolhido apenas para hoje'
                                 : 'treino padrão do dia'}`
-                            : getWeekdayLabel(workout.weekday)}
+                            : getWeekdaysLabel(workout)}
                     </p>
                 </div>
                 <div className="session-actions">
@@ -349,7 +350,7 @@ export default function WorkoutSessionPage() {
                                 >
                                     {otherWorkouts.map((item) => (
                                         <option key={item.id} value={item.id}>
-                                            {item.name} · {getWeekdayLabel(item.weekday)}
+                                            {item.name} · {getWeekdaysLabel(item)}
                                         </option>
                                     ))}
                                 </select>

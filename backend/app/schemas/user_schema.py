@@ -23,6 +23,7 @@ class UserCreate(UserBase):
     """Dados recebidos no cadastro tradicional (email e senha, secao 2.1)."""
 
     password: str = Field(..., min_length=8, max_length=128)
+    accept_terms: bool = Field(..., description="Aceite dos Termos de Uso e da Política de Privacidade")
 
 
 class UserLogin(BaseModel):

@@ -15,6 +15,7 @@ from sqlalchemy.orm import Session
 
 from app.config import settings
 from app.database import get_db
+from app.rate_limit import rate_limit_middleware
 from app.routers import auth_router, exercise_router, stats_router, workout_router
 
 app = FastAPI(
@@ -25,6 +26,9 @@ app = FastAPI(
         "execucoes e estatisticas de evolucao de carga."
     ),
 )
+
+# Limites por IP e tipo de rota.
+app.middleware("http")(rate_limit_middleware)
 
 # CORS: permite que o frontend React (Vite) faca chamadas HTTP para esta
 # API durante o desenvolvimento e em producao.

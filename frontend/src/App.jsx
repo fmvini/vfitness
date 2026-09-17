@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+import { lazy, Suspense, useEffect } from 'react'
 import {
     BrowserRouter,
     Routes,
@@ -10,14 +10,19 @@ import {
 import { useAuth } from './context/AuthContext'
 
 import Navbar from './components/Navbar'
+import SiteFooter from './components/SiteFooter'
+import CookieBanner from './components/CookieBanner'
 
-import LoginPage from './pages/LoginPage'
-import RegisterPage from './pages/RegisterPage'
-import DashboardPage from './pages/DashboardPage'
-import WorkoutDetailPage from './pages/WorkoutDetailPage'
-import WorkoutSessionPage from './pages/WorkoutSessionPage'
-import TodayWorkoutPage from './pages/TodayWorkoutPage'
-import StatsPage from './pages/StatsPage'
+const LoginPage = lazy(() => import('./pages/LoginPage'))
+const RegisterPage = lazy(() => import('./pages/RegisterPage'))
+const DashboardPage = lazy(() => import('./pages/DashboardPage'))
+const WorkoutDetailPage = lazy(() => import('./pages/WorkoutDetailPage'))
+const WorkoutSessionPage = lazy(() => import('./pages/WorkoutSessionPage'))
+const TodayWorkoutPage = lazy(() => import('./pages/TodayWorkoutPage'))
+const StatsPage = lazy(() => import('./pages/StatsPage'))
+const PrivacyPage = lazy(() => import('./pages/PrivacyPage'))
+const TermsPage = lazy(() => import('./pages/TermsPage'))
+const NotFoundPage = lazy(() => import('./pages/NotFoundPage'))
 
 function ScrollToTop() {
     const { pathname } = useLocation()
@@ -29,11 +34,25 @@ function ScrollToTop() {
     return null
 }
 
+function ConnectionUnavailable({ onRetry }) {
+    return (
+        <main className="connection-page">
+            <h1>Não foi possível conectar ao VFitness.</h1>
+            <p>A API está indisponível no momento. Sua sessão foi preservada.</p>
+            <button type="button" onClick={onRetry}>Tentar novamente</button>
+        </main>
+    )
+}
+
 function ProtectedRoute({ children }) {
-    const { isAuthenticated, loading } = useAuth()
+    const { isAuthenticated, loading, connectionError, retryConnection } = useAuth()
 
     if (loading) {
         return <div>Carregando...</div>
+    }
+
+    if (connectionError) {
+        return <ConnectionUnavailable onRetry={retryConnection} />
     }
 
     if (!isAuthenticated) {
@@ -44,10 +63,14 @@ function ProtectedRoute({ children }) {
 }
 
 function PublicRoute({ children }) {
-    const { isAuthenticated, loading } = useAuth()
+    const { isAuthenticated, loading, connectionError, retryConnection } = useAuth()
 
     if (loading) {
         return <div>Carregando...</div>
+    }
+
+    if (connectionError) {
+        return <ConnectionUnavailable onRetry={retryConnection} />
     }
 
     if (isAuthenticated) {
@@ -68,7 +91,10 @@ export default function App() {
             <ScrollToTop />
             <Navbar />
 
+            <Suspense fallback={<main className="route-loading">Carregando página...</main>}>
             <Routes>
+                <Route path="/privacidade" element={<PrivacyPage />} />
+                <Route path="/termos" element={<TermsPage />} />
                 <Route
                     path="/login"
                     element={
@@ -125,7 +151,7 @@ export default function App() {
 
                 <Route
                     path="/workouts/:id"
-                    element={<Navigate to="/" replace />}
+                    element={<NotFoundPage />}
                 />
 
                 <Route
@@ -139,9 +165,12 @@ export default function App() {
 
                 <Route
                     path="*"
-                    element={<Navigate to="/" replace />}
+                    element={<NotFoundPage />}
                 />
             </Routes>
+            </Suspense>
+            <SiteFooter />
+            <CookieBanner />
         </BrowserRouter>
     )
 }

@@ -1,13 +1,11 @@
-import client from './client'
+import client, { getCached } from './client'
 
 export async function getWorkouts() {
-    const response = await client.get('/workouts')
-    return response.data
+    return getCached('/workouts')
 }
 
 export async function getWorkoutById(workoutId) {
-    const response = await client.get(`/workouts/${workoutId}`)
-    return response.data
+    return getCached(`/workouts/${workoutId}`)
 }
 
 export async function createWorkout(workoutData) {
@@ -77,9 +75,5 @@ export async function reorderExercises(workoutId, exercises) {
 }
 
 export async function getExerciseLogs(exerciseId) {
-    const response = await client.get(
-        `/exercises/${exerciseId}/logs`
-    )
-
-    return response.data
+    return getCached(`/exercises/${exerciseId}/logs`)
 }
