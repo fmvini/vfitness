@@ -57,7 +57,7 @@ nao precisa de Client Secret nem URI de callback em ambiente local.
 
 O projeto esta dividido em dois deploys:
 
-- Frontend: `https://vfitness-frontend.vercel.app`
+- Frontend: `https://vfitness-app.vercel.app`
 - Backend: `https://vfitness-backend.vercel.app`
 
 No projeto do frontend na Vercel, configure:
@@ -72,7 +72,7 @@ No projeto do backend na Vercel, configure:
 ENVIRONMENT=production
 DEBUG=false
 SECRET_KEY=gere-uma-chave-longa-e-aleatoria
-CORS_ORIGINS=["https://vfitness-frontend.vercel.app"]
+CORS_ORIGINS=["https://vfitness-app.vercel.app"]
 DATABASE_URL=postgresql://postgres.qcjhtkiohtmmvpnjcvvw:<senha-escapada>@aws-0-us-east-1.pooler.supabase.com:6543/postgres?sslmode=require
 ```
 
@@ -118,7 +118,7 @@ ignorado `backend/.env.production`, nunca no codigo ou no bundle do frontend.
 arquivo (campo `SUPABASE_DB_PASSWORD`) e preserva a `SECRET_KEY` ja gerada nele.
 Com `--migrate`, aplica apenas as migracoes. Requer login previo na CLI da Vercel.
 O Client ID Google vem de `backend/.env`; a origem
-`https://vfitness-frontend.vercel.app` deve estar autorizada no Google Cloud.
+`https://vfitness-app.vercel.app` deve estar autorizada no Google Cloud.
 
 Testes locais, dentro do diretorio `backend`:
 

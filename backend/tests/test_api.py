@@ -68,6 +68,19 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(limiter.check(key, 2), 0)
         self.assertGreater(limiter.check(key, 2), 0)
 
+    def test_production_frontend_cors(self):
+        origin = "https://vfitness-app.vercel.app"
+        response = self.client.options(
+            "/auth/google",
+            headers={
+                "Origin": origin,
+                "Access-Control-Request-Method": "POST",
+                "Access-Control-Request-Headers": "content-type",
+            },
+        )
+        self.assertEqual(response.status_code, 200, response.text)
+        self.assertEqual(response.headers.get("Access-Control-Allow-Origin"), origin)
+
     def test_auth_and_isolation(self):
         self.request("GET", "/health/ready")
         self.request("GET", "/auth/me")

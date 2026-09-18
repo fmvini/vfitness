@@ -13,7 +13,7 @@ from sqlalchemy import text
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session
 
-from app.config import settings
+from app.config import PRODUCTION_FRONTEND_ORIGIN, settings
 from app.database import get_db
 from app.rate_limit import rate_limit_middleware
 from app.routers import auth_router, exercise_router, stats_router, workout_router
@@ -34,7 +34,7 @@ app.middleware("http")(rate_limit_middleware)
 # API durante o desenvolvimento e em producao.
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.cors_origins,
+    allow_origins=list(dict.fromkeys([*settings.cors_origins, PRODUCTION_FRONTEND_ORIGIN])),
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

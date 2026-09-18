@@ -27,7 +27,7 @@ settings = {
     "SECRET_KEY": values.get("SECRET_KEY") or secrets.token_urlsafe(48),
     "ENVIRONMENT": "production",
     "DEBUG": "false",
-    "CORS_ORIGINS": json.dumps(["https://vfitness-frontend.vercel.app"]),
+    "CORS_ORIGINS": json.dumps(["https://vfitness-app.vercel.app"]),
     "GOOGLE_CLIENT_ID": local.get("GOOGLE_CLIENT_ID", ""),
 }
 for name, value in settings.items():

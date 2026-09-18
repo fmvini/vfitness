@@ -14,7 +14,7 @@ import truststore
 truststore.inject_into_ssl()
 
 API = "https://vfitness-backend.vercel.app"
-FRONTEND = "https://vfitness-frontend.vercel.app"
+FRONTEND = "https://vfitness-app.vercel.app"
 email = f"deploy-check-{uuid4().hex}@example.com"
 other_email = f"deploy-check-{uuid4().hex}@example.com"
 password = secrets.token_urlsafe(24)

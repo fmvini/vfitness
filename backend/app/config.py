@@ -12,6 +12,8 @@ from pathlib import Path
 from pydantic import model_validator
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
+PRODUCTION_FRONTEND_ORIGIN = "https://vfitness-app.vercel.app"
+
 
 class Settings(BaseSettings):
     # --- Aplicacao ---
@@ -41,7 +43,7 @@ class Settings(BaseSettings):
     cors_origins: list[str] = [
         "http://localhost:5173",  # Vite dev server
         "http://127.0.0.1:5173",
-        "https://vfitness-frontend.vercel.app",
+        PRODUCTION_FRONTEND_ORIGIN,
     ]
 
     @model_validator(mode="after")
