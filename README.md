@@ -117,8 +117,11 @@ ignorado `backend/.env.production`, nunca no codigo ou no bundle do frontend.
 `backend/configure_production.py` configura os dois projetos a partir desse
 arquivo (campo `SUPABASE_DB_PASSWORD`) e preserva a `SECRET_KEY` ja gerada nele.
 Com `--migrate`, aplica apenas as migracoes. Requer login previo na CLI da Vercel.
-O Client ID Google vem de `backend/.env`; a origem
-`https://vfitness-app.vercel.app` deve estar autorizada no Google Cloud.
+O Client ID Google e publico e tambem esta no bundle do frontend como fallback caso
+`VITE_GOOGLE_CLIENT_ID` nao esteja definido na Vercel. O backend usa o mesmo
+Client ID para validar o token. No Google Cloud Console, abra o cliente OAuth Web
+e inclua `https://vfitness-app.vercel.app` em **Origens JavaScript autorizadas**.
+Este fluxo usa callback JavaScript, sem URI de redirecionamento no Google ou no Supabase.
 
 Testes locais, dentro do diretorio `backend`:
 

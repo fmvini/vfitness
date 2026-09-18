@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react'
 import { useCookieConsent } from '../context/CookieConsentContext'
+import { GOOGLE_CLIENT_ID } from '../config/google'
 
 const GOOGLE_SCRIPT_URL = 'https://accounts.google.com/gsi/client'
 
@@ -7,7 +8,7 @@ export default function GoogleLoginButton({ onCredential, disabled }) {
     const containerRef = useRef(null)
     const [error, setError] = useState('')
     const { choice, openPreferences } = useCookieConsent()
-    const clientId = import.meta.env.VITE_GOOGLE_CLIENT_ID
+    const clientId = GOOGLE_CLIENT_ID
 
     useEffect(() => {
         if (!clientId || disabled || choice !== 'accepted') {

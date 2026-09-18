@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import GoogleLoginButton from '../components/GoogleLoginButton'
+import { GOOGLE_CLIENT_ID } from '../config/google'
 
 function getLoginError(error, fallback) {
     if (!error.response) return 'Não foi possível conectar ao serviço. Tente novamente.'
@@ -71,7 +72,7 @@ export default function LoginPage() {
                     {error && <p className="form-error" role="alert">{error}</p>}
                     <button type="submit" disabled={loading}>{loading ? 'Entrando...' : 'Entrar'}</button>
                 </form>
-                {import.meta.env.VITE_GOOGLE_CLIENT_ID && <div className="google-terms">
+                {GOOGLE_CLIENT_ID && <div className="google-terms">
                     <label className="terms-check">
                         <input type="checkbox" checked={acceptGoogleTerms} onChange={(event) => setAcceptGoogleTerms(event.target.checked)} />
                         <span>Para entrar com Google, li e aceito os <Link to="/termos" target="_blank">Termos de Uso</Link> e a <Link to="/privacidade" target="_blank">Política de Privacidade</Link>.</span>
