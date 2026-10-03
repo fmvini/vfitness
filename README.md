@@ -6,7 +6,7 @@ acompanhamento de progresso.
 ## Preview para recrutadores
 
 A rota publica `/preview` permite experimentar o VFitness sem cadastro ou login.
-Depois de publicar esta versao, o link sera
+O link de producao e
 `https://vfitness-app.vercel.app/preview`; localmente, use
 `http://127.0.0.1:5173/preview`.
 
@@ -99,6 +99,12 @@ DATABASE_URL=postgresql://postgres.qcjhtkiohtmmvpnjcvvw:<senha-escapada>@aws-0-u
 A URL publica do projeto Supabase (`https://qcjhtkiohtmmvpnjcvvw.supabase.co`)
 nao substitui a `DATABASE_URL`: o backend precisa da connection string do
 Postgres, encontrada no painel do Supabase em Project Settings > Database.
+
+URLs `postgres://` e `postgresql://` sao normalizadas para
+`postgresql+psycopg2://`, usando o driver instalado em `requirements.txt` sem
+depender do driver padrao do SQLAlchemy. O mesmo tratamento se aplica ao Alembic.
+URLs com um driver explicitamente informado sao preservadas; esse driver deve
+estar instalado no ambiente.
 
 Depois de configurar a `DATABASE_URL`, execute as migracoes do Alembic contra
 o banco online antes de usar o app em producao:

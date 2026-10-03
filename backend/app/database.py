@@ -16,13 +16,14 @@ from app.config import settings
 
 def normalize_database_url(database_url: str) -> str:
     """
-    SQLAlchemy 2 expects the canonical postgresql:// dialect name.
+    Select the installed psycopg2 driver for PostgreSQL URLs without a driver.
 
-    Some hosted providers and dashboards still show postgres:// connection
-    strings, so normalize that common variant before creating the engine.
+    Keep explicitly selected drivers and the rest of the URL unchanged, avoiding
+    dependency on SQLAlchemy's default PostgreSQL driver.
     """
-    if database_url.startswith("postgres://"):
-        return database_url.replace("postgres://", "postgresql://", 1)
+    for scheme in ("postgres://", "postgresql://"):
+        if database_url.startswith(scheme):
+            return "postgresql+psycopg2://" + database_url[len(scheme):]
 
     return database_url
 

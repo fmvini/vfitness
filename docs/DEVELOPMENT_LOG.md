@@ -1,3 +1,33 @@
+## 2026-10-03 — Correção do driver PostgreSQL na Vercel
+
+### Implementado
+- URLs `postgres://` e `postgresql://` normalizadas para `postgresql+psycopg2://`, selecionando o driver já instalado em vez do padrão variável do SQLAlchemy.
+- Preservação integral das credenciais escapadas, host, porta, path e query; URLs com driver explícito e outros dialetos mantidos sem alteração.
+- Quatro testes de regressão para normalização, idempotência, preservação e carregamento da DBAPI sem conectar ao banco real.
+- Cache de QA excluído dos uploads da CLI Vercel e README atualizado com o contrato de conexão e o preview já publicado.
+
+### Arquivos principais alterados
+- `backend/app/database.py`
+- `backend/tests/test_database_url.py`
+- `.vercelignore`
+- `README.md`
+- `docs/DEVELOPMENT_LOG.md`
+
+### Decisões técnicas
+- Logs do deployment `dpl_9N1P6GNtyH5b8Ttn96RpyrU9dw23` confirmaram falha no import de `psycopg` em `create_engine`, impedindo inclusive `/health` e o preflight CORS.
+- SQLAlchemy 2.1 mudou o driver padrão das URLs PostgreSQL genéricas para psycopg3; `requirements.txt` instala psycopg2. Escolher explicitamente psycopg2 evita depender desse padrão sem adicionar outra DBAPI.
+- A normalização já é compartilhada pelo runtime e pelo Alembic. Não alterar banco, migrations, credenciais, autenticação ou dependências para esta correção.
+- Maestro coordenou auditorias read-only dos três agentes; backend implementou o helper e os testes. Diagnóstico por endpoints/logs públicos e CLI autenticada, sem expor segredos.
+
+### Estado atual
+- Backend: 12 testes aprovados com SQLAlchemy 2.0.52 e com SQLAlchemy 2.1.0 instalado somente em cache temporário. URL genérica reproduziu `ModuleNotFoundError: psycopg` no 2.1; normalização corrigida carregou psycopg2 sem conexão real.
+- Frontend: 16 testes aprovados. `/preview` publicado foi verificado no navegador durante a indisponibilidade da API: exemplos carregaram sem chamadas ao backend nem erro de conexão.
+- Correção validada localmente; produção ainda retorna 500 no deployment antigo e precisa receber o novo backend.
+
+### Próximos passos
+- Publicar a correção no projeto Vercel `vfitness-backend`, preservando as variáveis existentes, e confirmar `/health` e `/health/ready` com 200, `/auth/me` anônimo com 401 e preflight com 200/CORS correto.
+- Registrar o deployment e os resultados da verificação após a publicação; não executar migrations nem fazer push automático.
+
 ## 2026-10-03 — Preview público para recrutadores
 
 ### Implementado
