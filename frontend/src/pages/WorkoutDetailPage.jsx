@@ -1,3 +1,4 @@
+import { routePath } from '../utils/routePath.js'
 import { useEffect, useRef, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 
@@ -128,20 +129,20 @@ export default function WorkoutDetailPage() {
         return (
             <main className="workout-detail-page">
                 <p>{error || 'Treino não encontrado.'}</p>
-                <Link className="text-link" to="/">Voltar aos treinos</Link>
+                <Link className="text-link" to={routePath('/')}>Voltar aos treinos</Link>
             </main>
         )
     }
 
     return (
         <main className="workout-detail-page">
-            <Link className="text-link back-link" to="/">Voltar aos treinos</Link>
+            <Link className="text-link back-link" to={routePath('/')}>Voltar aos treinos</Link>
             <div className="page-heading">
                 <div>
                     <h1>Configurar {workout.name}</h1>
                     <p>{getWeekdaysLabel(workout)}</p>
                 </div>
-                <Link className="button" to={`/workouts/${workout.id}/session`}>
+                <Link className="button" to={routePath(`/workouts/${workout.id}/session`)}>
                     Iniciar treino
                 </Link>
             </div>

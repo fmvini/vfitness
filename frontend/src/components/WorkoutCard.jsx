@@ -1,3 +1,4 @@
+import { routePath } from '../utils/routePath.js'
 import { Link } from 'react-router-dom'
 import { getWeekdaysLabel } from '../utils/weekdayDetector'
 
@@ -21,10 +22,10 @@ export default function WorkoutCard({
                 {isToday && <p>Pronto para começar.</p>}
             </div>
             <div className="workout-card-actions">
-                <Link className="button button-small" to={isToday ? '/today' : `/workouts/${workout.id}/session`}>
+                <Link className="button button-small" to={routePath(isToday ? '/today' : `/workouts/${workout.id}/session`)}>
                     Iniciar
                 </Link>
-                <Link className="text-link" to={`/workouts/${workout.id}/edit`}>Atividades</Link>
+                <Link className="text-link" to={routePath(`/workouts/${workout.id}/edit`)}>Atividades</Link>
                 <button type="button" className="text-button" onClick={() => onEdit(workout)}>Editar</button>
                 <button type="button" className="text-button danger-text" onClick={handleDelete}>Remover</button>
             </div>

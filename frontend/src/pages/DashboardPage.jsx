@@ -1,3 +1,4 @@
+import { routePath } from '../utils/routePath.js'
 import { useEffect, useMemo, useState } from 'react'
 import { Link } from 'react-router-dom'
 
@@ -116,11 +117,11 @@ export default function DashboardPage() {
                                 <button type="button" onClick={retryLoad}>Tentar novamente</button>
                             ) : todayWorkout ? (
                                 <>
-                                    <Link className="button" to="/today">Iniciar treino</Link>
-                                    <Link className="button button-secondary" to={`/workouts/${todayWorkout.id}/edit`}>Ver atividades</Link>
+                                    <Link className="button" to={routePath('/today')}>Iniciar treino</Link>
+                                    <Link className="button button-secondary" to={routePath(`/workouts/${todayWorkout.id}/edit`)}>Ver atividades</Link>
                                 </>
                             ) : workouts.length ? (
-                                <Link className="button" to="/today">Escolher treino para hoje</Link>
+                                <Link className="button" to={routePath('/today')}>Escolher treino para hoje</Link>
                             ) : (
                                 <a className="button" href="#novo-treino">Criar primeiro treino</a>
                             )}

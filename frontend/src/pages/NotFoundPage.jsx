@@ -1,3 +1,4 @@
+import { routePath } from '../utils/routePath.js'
 import { Link } from 'react-router-dom'
 
 export default function NotFoundPage() {
@@ -7,7 +8,7 @@ export default function NotFoundPage() {
             <div>
                 <h1>Essa rota saiu do treino.</h1>
                 <p>A página que você procurou não existe. Volte para sua rotina e continue de onde parou.</p>
-                <Link className="button" to="/">Voltar ao início</Link>
+                <Link className="button" to={routePath('/')}>Voltar ao início</Link>
             </div>
         </main>
     )

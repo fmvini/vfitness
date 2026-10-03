@@ -1,4 +1,6 @@
 import { findTodayWorkout } from './weekdayDetector.js'
+import { isPreviewMode } from '../preview/previewMode.js'
+import { previewUiStorage } from './previewUiStorage.js'
 
 export function getLocalDateKey(date = new Date()) {
     const year = date.getFullYear()
@@ -9,6 +11,9 @@ export function getLocalDateKey(date = new Date()) {
 }
 
 function getStorage(storage) {
+    if (isPreviewMode()) {
+        return previewUiStorage
+    }
     if (storage) {
         return storage
     }
@@ -17,7 +22,8 @@ function getStorage(storage) {
 }
 
 function getSelectionKey(userId, date) {
-    return `vfitness-today-workout-${userId}-${getLocalDateKey(date)}`
+    const prefix = isPreviewMode() ? 'vfitness-preview-today-workout' : 'vfitness-today-workout'
+    return `${prefix}-${userId}-${getLocalDateKey(date)}`
 }
 
 export function getDailyWorkoutSelection(userId, date = new Date(), storage) {

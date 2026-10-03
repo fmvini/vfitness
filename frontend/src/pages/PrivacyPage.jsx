@@ -1,9 +1,10 @@
+import { routePath } from '../utils/routePath.js'
 import { Link } from 'react-router-dom'
 
 export default function PrivacyPage() {
     return (
         <main className="legal-page">
-            <Link className="text-link" to="/">← Voltar ao VFitness</Link>
+            <Link className="text-link" to={routePath('/')}>← Voltar ao VFitness</Link>
             <h1>Política de Privacidade</h1>
             <p className="legal-updated">Atualizada em 17 de setembro de 2026</p>
             <p>Esta política explica como o VFitness trata dados quando você cria uma conta e registra seus treinos. Para dúvidas ou para exercer seus direitos, escreva para <a href="mailto:viniciusfmarrocos@gmail.com">viniciusfmarrocos@gmail.com</a>.</p>

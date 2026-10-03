@@ -1,12 +1,13 @@
+import { routePath } from '../utils/routePath.js'
 import { Link } from 'react-router-dom'
 
 export default function TermsPage() {
     return (
         <main className="legal-page">
-            <Link className="text-link" to="/">← Voltar ao VFitness</Link>
+            <Link className="text-link" to={routePath('/')}>← Voltar ao VFitness</Link>
             <h1>Termos de Uso</h1>
             <p className="legal-updated">Atualizados em 17 de setembro de 2026</p>
-            <p>Ao criar uma conta no VFitness, você concorda com estes termos e confirma que leu a <Link to="/privacidade">Política de Privacidade</Link>. O aceite é registrado com data e hora.</p>
+            <p>Ao criar uma conta no VFitness, você concorda com estes termos e confirma que leu a <Link to={routePath('/privacidade')}>Política de Privacidade</Link>. O aceite é registrado com data e hora.</p>
 
             <h2>O serviço</h2>
             <p>O VFitness permite planejar treinos, registrar atividades e acompanhar estatísticas pessoais. O conteúdo inserido na conta é de sua responsabilidade. As informações exibidas não substituem orientação médica ou profissional de educação física.</p>

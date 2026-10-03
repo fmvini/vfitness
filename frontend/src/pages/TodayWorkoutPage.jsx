@@ -1,3 +1,4 @@
+import { routePath } from '../utils/routePath.js'
 import { useEffect, useState } from 'react'
 import { Link, Navigate, useNavigate } from 'react-router-dom'
 
@@ -48,7 +49,7 @@ export default function TodayWorkoutPage() {
     if (todayWorkout) {
         return (
             <Navigate
-                to={`/workouts/${todayWorkout.id}/session?today=1`}
+                to={routePath(`/workouts/${todayWorkout.id}/session?today=1`)}
                 replace
             />
         )
@@ -61,7 +62,7 @@ export default function TodayWorkoutPage() {
         }
 
         setDailyWorkoutSelection(user?.id, selectedWorkoutId)
-        navigate(`/workouts/${selectedWorkoutId}/session?today=1`, {
+        navigate(routePath(`/workouts/${selectedWorkoutId}/session?today=1`), {
             replace: true
         })
     }
@@ -102,7 +103,7 @@ export default function TodayWorkoutPage() {
                             <button type="submit">Iniciar treino</button>
                         </form>
                     ) : (
-                        <Link className="button" to="/">Configurar treinos</Link>
+                        <Link className="button" to={routePath('/')}>Configurar treinos</Link>
                     )}
                 </div>
             )}

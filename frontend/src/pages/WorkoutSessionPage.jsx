@@ -1,3 +1,4 @@
+import { routePath } from '../utils/routePath.js'
 import { useEffect, useMemo, useState } from 'react'
 import {
     Link,
@@ -12,6 +13,8 @@ import {
     registerExerciseLog
 } from '../api/workoutApi'
 import { useAuth } from '../context/AuthContext'
+import { isPreviewMode } from '../preview/previewMode.js'
+import { previewUiStorage } from '../utils/previewUiStorage.js'
 import {
     clearDailyWorkoutSelection,
     resolveTodayWorkout,
@@ -97,7 +100,9 @@ export default function WorkoutSessionPage() {
     const [saving, setSaving] = useState(false)
     const [message, setMessage] = useState('')
     const [error, setError] = useState('')
-    const storageKey = `vfitness-session-${id}-${localDateKey()}`
+    const preview = isPreviewMode()
+    const storage = preview ? previewUiStorage : localStorage
+    const storageKey = `${preview ? 'vfitness-preview-session' : 'vfitness-session'}-${id}-${localDateKey()}`
 
     useEffect(() => {
         async function loadWorkout() {
@@ -114,9 +119,9 @@ export default function WorkoutSessionPage() {
                 )
                 let stored = null
                 try {
-                    stored = JSON.parse(localStorage.getItem(storageKey) || 'null')
+                    stored = JSON.parse(storage.getItem(storageKey) || 'null')
                 } catch (error) {
-                    localStorage.removeItem(storageKey)
+                    storage.removeItem(storageKey)
                 }
                 setWorkout(data)
                 setProgress(mergeStoredProgress(data.exercises, initial, stored?.progress))
@@ -132,7 +137,7 @@ export default function WorkoutSessionPage() {
         }
 
         loadWorkout()
-    }, [id, storageKey])
+    }, [id, storageKey, storage])
 
     useEffect(() => {
         if (!isTodaySession) {
@@ -162,12 +167,12 @@ export default function WorkoutSessionPage() {
             String(workout.id) === String(id) &&
             Object.keys(progress).length
         ) {
-            localStorage.setItem(
+            storage.setItem(
                 storageKey,
                 JSON.stringify({ progress, finished })
             )
         }
-    }, [finished, id, progress, storageKey, workout])
+    }, [finished, id, progress, storageKey, storage, workout])
 
     const completedCount = useMemo(
         () => Object.values(progress).filter((item) => item.complete).length,
@@ -264,7 +269,7 @@ export default function WorkoutSessionPage() {
         }
 
         setSwitchOpen(false)
-        navigate(`/workouts/${replacement.id}/session?today=1`, {
+        navigate(routePath(`/workouts/${replacement.id}/session?today=1`), {
             replace: true
         })
     }
@@ -277,7 +282,7 @@ export default function WorkoutSessionPage() {
         return (
             <main className="workout-session-page">
                 <p className="form-error">{error}</p>
-                <Link className="text-link" to="/">Voltar aos treinos</Link>
+                <Link className="text-link" to={routePath('/')}>Voltar aos treinos</Link>
             </main>
         )
     }
@@ -319,7 +324,7 @@ export default function WorkoutSessionPage() {
                             Trocar treino
                         </button>
                     )}
-                    <Link className="button-secondary button" to={`/workouts/${workout.id}/edit`}>
+                    <Link className="button-secondary button" to={routePath(`/workouts/${workout.id}/edit`)}>
                         Configurar treino
                     </Link>
                 </div>
@@ -380,7 +385,7 @@ export default function WorkoutSessionPage() {
                 <div className="empty-state">
                     <h2>Treino sem atividades</h2>
                     <p>Adicione exercícios ou cardio antes de iniciar.</p>
-                    <Link className="button" to={`/workouts/${workout.id}/edit`}>
+                    <Link className="button" to={routePath(`/workouts/${workout.id}/edit`)}>
                         Adicionar atividades
                     </Link>
                 </div>

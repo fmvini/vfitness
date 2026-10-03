@@ -12,8 +12,21 @@ import {
     logout as logoutRequest,
     getCurrentUser
 } from '../api/authApi'
+import { getPreviewUser } from '../preview/previewApi.js'
 
 const AuthContext = createContext()
+
+export function PreviewAuthProvider({ children }) {
+    const value = {
+        user: getPreviewUser(),
+        isAuthenticated: true,
+        isPreview: true,
+        loading: false,
+        connectionError: false
+    }
+
+    return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>
+}
 
 export function AuthProvider({ children }) {
     const [user, setUser] = useState(null)

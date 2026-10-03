@@ -244,6 +244,16 @@ button.danger-text, .danger-text { color: var(--color-danger); }
 .not-found-page p { max-width: 37ch; margin: 18px 0 30px; }
 .route-loading { display: grid; min-height: 60vh; place-items: center; color: var(--color-text-muted); }
 
+.preview-banner { display: flex; width: min(calc(100% - 48px), var(--container-width)); align-items: center; justify-content: space-between; gap: 20px; margin: 24px auto 0; padding: 18px 22px; border: 1px solid var(--color-primary-border); border-radius: var(--radius-md); background: var(--color-primary-soft); color: var(--color-text); }
+.preview-banner p { max-width: 72ch; margin: 5px 0 0; color: var(--color-text-soft); font-size: .9rem; }
+.preview-banner button { flex-shrink: 0; }
+.preview-reset-status { display: block; color: var(--color-success); font-size: .85rem; }
+.preview-reset-status:empty { display: none; }
+
+@media (max-width: 760px) {
+    .preview-banner { width: min(calc(100% - 28px), var(--container-width)); align-items: flex-start; flex-direction: column; gap: 14px; padding: 16px; }
+}
+
 @media (max-width: 1050px) {
     .navbar-inner { gap: 23px; }
     .navbar-user { max-width: 85px; }

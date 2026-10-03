@@ -3,6 +3,26 @@
 Aplicacao full stack para gestao de treinos, registro de execucoes e
 acompanhamento de progresso.
 
+## Preview para recrutadores
+
+A rota publica `/preview` permite experimentar o VFitness sem cadastro ou login.
+Depois de publicar esta versao, o link sera
+`https://vfitness-app.vercel.app/preview`; localmente, use
+`http://127.0.0.1:5173/preview`.
+
+O preview reutiliza as telas de treinos, treino do dia, configuracao de exercicios,
+execucao de sessoes e estatisticas. Os dados sao ficticios, e criar, editar,
+excluir ou registrar atividades altera somente a demonstracao em memoria no
+navegador. O botao **Reiniciar demonstracao** restaura os exemplos; recarregar a
+pagina tambem descarta as alteracoes. Nenhuma conta, token ou dado real e
+necessario. As rotas normais e a API continuam exigindo autenticacao.
+
+Os testes do preview podem ser executados no diretorio `frontend`:
+
+```powershell
+npm test
+```
+
 ## Requisitos
 
 - Python 3.11 ou superior
