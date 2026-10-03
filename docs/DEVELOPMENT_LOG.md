@@ -22,11 +22,15 @@
 ### Estado atual
 - Backend: 12 testes aprovados com SQLAlchemy 2.0.52 e com SQLAlchemy 2.1.0 instalado somente em cache temporário. URL genérica reproduziu `ModuleNotFoundError: psycopg` no 2.1; normalização corrigida carregou psycopg2 sem conexão real.
 - Frontend: 16 testes aprovados. `/preview` publicado foi verificado no navegador durante a indisponibilidade da API: exemplos carregaram sem chamadas ao backend nem erro de conexão.
-- Correção validada localmente; produção ainda retorna 500 no deployment antigo e precisa receber o novo backend.
+- Correção commitada em `3a4d894` e publicada no backend; deployment `dpl_4dxmfPU915KGESoNjMwtL3p4UTHc`, alias `https://vfitness-backend.vercel.app`.
+- Verificação pública após deploy: `/health` e `/health/ready` retornaram 200; `/auth/me` anônimo retornou 401; preflight `OPTIONS /auth/me` retornou 200 com origem `https://vfitness-app.vercel.app`. Não houve mais `FUNCTION_INVOCATION_FAILED` nessas sondagens.
+- Comunicação confirmada no navegador a partir do frontend publicado: health 200 e token sintético inválido corretamente rejeitado com 401, sem bloqueio CORS.
+- Apenas backend publicado pela CLI. Nenhuma conta criada, migration aplicada, credencial alterada ou push executado; commits locais ainda precisam ser enviados ao GitHub para que novos deploys automáticos preservem a correção.
 
 ### Próximos passos
-- Publicar a correção no projeto Vercel `vfitness-backend`, preservando as variáveis existentes, e confirmar `/health` e `/health/ready` com 200, `/auth/me` anônimo com 401 e preflight com 200/CORS correto.
-- Registrar o deployment e os resultados da verificação após a publicação; não executar migrations nem fazer push automático.
+- Usuário pode usar “Tentar novamente” na página ou recarregar; login com conta real deve ser validado pelo próprio usuário, sem compartilhar token ou senha.
+- Enviar os commits locais ao GitHub quando solicitado; a publicação atual já está funcionando, mas o repositório remoto precisa da correção para os próximos deploys automáticos.
+- Em manutenção futura, considerar um lock de dependências Python para tornar rebuilds reproduzíveis; não houve mudança de dependências nesta correção.
 
 ## 2026-10-03 — Preview público para recrutadores
 
